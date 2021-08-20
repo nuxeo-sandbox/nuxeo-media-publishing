@@ -50,10 +50,8 @@ import java.util.Map;
 public class YouTubeService extends OAuth2MediaPublishingProvider {
     private static final Log log = LogFactory.getLog(YouTubeService.class);
 
-    public static final String PROVIDER = "YouTube";
-
-    public YouTubeService() {
-        super(PROVIDER);
+    public YouTubeService(String providerName) {
+        super(providerName);
     }
 
     public YouTubeClient getYouTubeClient(String account) {
@@ -121,8 +119,8 @@ public class YouTubeService extends OAuth2MediaPublishingProvider {
 
     @Override
     public boolean unpublish(PublishableMedia media) throws IOException {
-        String account = media.getAccount(PROVIDER);
-        String mediaId = media.getId(PROVIDER);
+        String account = media.getAccount(this.providerName);
+        String mediaId = media.getId(this.providerName);
         return getYouTubeClient(account).delete(mediaId);
     }
 

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2021 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,11 @@
 
 package org.nuxeo.ecm.media.publishing;
 
-import org.nuxeo.ecm.core.api.DocumentModel;
+import java.util.List;
 import java.util.Map;
+
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.media.publishing.upload.MediaPublishingProgressListener;
 
 /**
  * @since 7.3
@@ -30,15 +33,17 @@ public interface MediaPublishingService {
     /**
      * Return a list of the available media publishing services for the given document
      */
-    String[] getAvailableProviders(DocumentModel doc);
+    List<String> getAvailableProviders();
 
     /**
      * Schedules an upload
+     * 
      * @param doc the Document to upload
      * @param provider the id of the media publishing provider
      * @return the id of the publishing work
      */
-    String publish(DocumentModel doc, String provider, String account, Map<String, String> options);
+    String publish(DocumentModel doc, String provider, String account, Map<String, String> options,
+            MediaPublishingProgressListener listener);
 
     /**
      * Unpublish the media

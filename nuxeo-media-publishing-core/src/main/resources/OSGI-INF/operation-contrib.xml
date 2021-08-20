@@ -1,0 +1,9 @@
+<component name="org.nuxeo.ecm.media.publishing.operations">
+
+    <extension target="org.nuxeo.ecm.core.operation.OperationServiceComponent"
+               point="operations">
+        <operation class="org.nuxeo.ecm.media.publishing.automation.MediaPublishOp"/>
+        <operation class="org.nuxeo.ecm.media.publishing.automation.MediaUnpublishOp"/>
+    </extension>
+
+</component>

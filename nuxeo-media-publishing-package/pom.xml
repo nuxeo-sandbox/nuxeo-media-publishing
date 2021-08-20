@@ -1,38 +1,29 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.nuxeo.ecm.media.publishing</groupId>
     <artifactId>nuxeo-media-publishing</artifactId>
-    <version>11.1-SNAPSHOT</version>
+    <version>2021.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>nuxeo-media-publishing-package</artifactId>
   <packaging>zip</packaging>
-  <name>Nuxeo Media Publishing Marketplace Package</name>
+  <name>Nuxeo media publishing package - Nuxeo media publishing</name>
 
   <dependencies>
+    <!-- Base distribution(s) for the MP -->
     <dependency>
       <groupId>org.nuxeo.ecm.distribution</groupId>
       <artifactId>nuxeo-nxr-server</artifactId>
       <type>zip</type>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.nuxeo.ecm.distribution</groupId>
-      <artifactId>nuxeo-nxr-jsf-ui</artifactId>
-      <type>zip</type>
-      <scope>provided</scope>
-    </dependency>
+
+    <!-- Additional bundles to be deployed by the MP -->
     <dependency>
       <groupId>org.nuxeo.ecm.media.publishing</groupId>
       <artifactId>nuxeo-media-publishing-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.ecm.media.publishing</groupId>
-      <artifactId>nuxeo-media-publishing-jsf</artifactId>
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.media.publishing</groupId>
@@ -44,11 +35,7 @@
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.media.publishing</groupId>
-      <artifactId>nuxeo-media-publishing-wistia-jsf</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.ecm.media.publishing</groupId>
-      <artifactId>nuxeo-media-publishing-youtube-jsf</artifactId>
+      <artifactId>nuxeo-media-publishing-webui</artifactId>
     </dependency>
   </dependencies>
 
@@ -65,5 +52,6 @@
       </plugin>
     </plugins>
   </build>
+
 
 </project>

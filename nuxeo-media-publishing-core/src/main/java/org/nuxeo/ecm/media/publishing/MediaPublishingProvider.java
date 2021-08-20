@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2021 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,11 @@
 
 package org.nuxeo.ecm.media.publishing;
 
+import java.io.IOException;
+import java.util.Map;
+
 import org.nuxeo.ecm.media.publishing.adapter.PublishableMedia;
 import org.nuxeo.ecm.media.publishing.upload.MediaPublishingProgressListener;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Interface to be implemented by Media Publishing Providers.
@@ -36,7 +35,8 @@ public interface MediaPublishingProvider {
     /**
      * Upload the media
      */
-    String upload(PublishableMedia media, MediaPublishingProgressListener progressListener, String account, Map<String, String> options) throws IOException;
+    String upload(PublishableMedia media, MediaPublishingProgressListener progressListener, String account,
+            Map<String, String> options) throws IOException;
 
     /**
      * Unpublish the media

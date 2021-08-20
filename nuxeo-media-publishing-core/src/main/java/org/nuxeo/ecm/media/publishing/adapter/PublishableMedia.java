@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2021 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 
 package org.nuxeo.ecm.media.publishing.adapter;
 
-import org.nuxeo.ecm.core.api.Blob;
-
 import java.util.List;
 import java.util.Map;
+
+import org.nuxeo.ecm.core.api.Blob;
 
 /**
  * @since 7.3
@@ -36,9 +36,9 @@ public interface PublishableMedia {
 
     boolean isPublishedByProvider(String provider);
 
-    List getProviders();
+    List<Map<String, Object>> getProviders();
 
-    void setProviders(List<Map<String,Object>> providers);
+    void setProviders(List<Map<String, Object>> providers);
 
     String getId(String provider);
 

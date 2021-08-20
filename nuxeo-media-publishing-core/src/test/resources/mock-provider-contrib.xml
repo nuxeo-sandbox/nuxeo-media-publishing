@@ -1,0 +1,5 @@
+<component name="org.nuxeo.ecm.media.publishing.mock.provider-contrib">
+    <extension target="org.nuxeo.ecm.media.publishing.MediaPublishingService" point="providers" >
+        <provider id="mock" enabled="true" service="org.nuxeo.ecm.media.publishing.mock.MockMediaProvider" />
+    </extension>
+</component>

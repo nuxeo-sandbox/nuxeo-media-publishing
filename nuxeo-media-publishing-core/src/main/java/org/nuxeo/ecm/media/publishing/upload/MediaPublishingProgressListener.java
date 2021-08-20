@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2021 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,10 @@ package org.nuxeo.ecm.media.publishing.upload;
  */
 public interface MediaPublishingProgressListener {
     void onStart();
+
     void onProgress(double progress);
+
     void onComplete();
+
     void onError();
 }

@@ -49,10 +49,8 @@ public class WistiaService extends OAuth2MediaPublishingProvider {
 
     private static final Log log = LogFactory.getLog(WistiaService.class);
 
-    public static final String PROVIDER = "Wistia";
-
-    public WistiaService() {
-        super(PROVIDER);
+    public WistiaService(String providerName) {
+        super(providerName);
     }
 
     public WistiaClient getWistiaClient(String account) {
@@ -102,8 +100,8 @@ public class WistiaService extends OAuth2MediaPublishingProvider {
 
     @Override
     public boolean unpublish(PublishableMedia media) {
-        String account = media.getAccount(PROVIDER);
-        String mediaId = media.getId(PROVIDER);
+        String account = media.getAccount(this.providerName);
+        String mediaId = media.getId(this.providerName);
         return getWistiaClient(account).deleteMedia(mediaId) != null;
     }
 

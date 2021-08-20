@@ -1,17 +1,12 @@
-<project name="nuxeo-media-publishing-assembly"
-         default="build"
-         xmlns:nx="urn:nuxeo-build"
-         xmlns:artifact="urn:nuxeo-artifact">
+<project name="nuxeo-media-publishing" default="build" xmlns:nx="urn:nuxeo-build" xmlns:artifact="urn:nuxeo-artifact">
   <taskdef resource="org/nuxeo/build/antlib.xml" uri="urn:nuxeo-build" />
   <taskdef resource="org/nuxeo/build/artifact/antlib.xml" uri="urn:nuxeo-artifact" />
   <taskdef resource="net/sf/antcontrib/antlib.xml" />
 
-  <target name="build" description="Build Nuxeo Media Publishing Marketplace package">
+  <target name="build" description="Build ${maven.project.name}">
     <property name="outdir" value="${maven.project.build.directory}" />
-    <artifact:nuxeo-expand includeTestScope="true" groupPrefixes="org.nuxeo" />
-    <!-- For Nuxeo IDE being able to use that distribution as a SDK -->
-    <artifact:print output="${outdir}/artifacts-media-publishing.properties" mode="sdk" />
-    <artifact:print output="${outdir}/test-artifacts-media-publishing.properties" mode="sdk" scopes="test" />
+    <!-- Include your artifacts in the graph adding your groupId to groupPrefixes -->
+    <artifact:nuxeo-expand includeTestScope="true" groupPrefixes="org.nuxeo,org.nuxeo.ecm.media.publishing" />
     <!-- Prints the graph for debugging purpose -->
     <artifact:print output="${outdir}/dependency-tree.log" />
     <tstamp />
@@ -25,15 +20,14 @@
       <filterset>
         <filter token="VERSION" value="${maven.project.version}" />
         <filter token="DISTRIB_VERSION" value="${nuxeo.platform.version}" />
+        <filter token="NUXEO_TARGET_VERSION" value="${nuxeo.target.version}" />
+        <filter token="STUDIO_PROJECT_VERSION" value="${studio.project.version}" />
       </filterset>
     </copy>
-    <copy file="${outdir}/artifacts-media-publishing.properties" todir="${outdir}/marketplace/install" />
-    <copy file="${outdir}/test-artifacts-media-publishing.properties" todir="${outdir}/marketplace/install" />
 
     <!-- Base distribution NXR -->
     <copy todir="${outdir}">
       <artifact:file key="org.nuxeo.ecm.distribution:nuxeo-nxr-server::zip" />
-      <artifact:file key="org.nuxeo.ecm.distribution:nuxeo-nxr-jsf-ui::zip" />
     </copy>
 
     <!-- Nuxeo bundles -->
@@ -41,12 +35,17 @@
       <artifact:set>
         <includes>
           <artifact groupId="org.nuxeo*" />
+          <artifact groupId="nuxeo-studio" />
+          <!-- Include your artifacts using their groupId for instance -->
+          <artifact groupId="org.nuxeo.ecm.media.publishing*" />
         </includes>
         <excludes>
-          <artifact groupId="org.nuxeo.lib*" />
+          <artifact groupId="${maven.project.groupId}" artifactId="${maven.project.artifactId}" version="${maven.project.version}" type="${maven.project.packaging}" />
           <artifact scope="test" />
           <artifact scope="provided" />
           <artifact type="pom" />
+          <artifact groupId="org.nuxeo.lib*" />
+          <artifact groupId="org.nuxeo.build*" />
         </excludes>
       </artifact:set>
     </copy>
@@ -54,38 +53,36 @@
     <copy todir="${outdir}/nxr/lib" overwrite="true">
       <artifact:set>
         <includes>
-          <artifact groupId="!org.nuxeo*" scope="!test" />
-          <artifact groupId="org.nuxeo.lib*" scope="!test" />
+          <artifact groupId="!org.nuxeo*" />
+          <artifact groupId="org.nuxeo.lib*" />
+          <artifact groupId="org.nuxeo.build*" />
         </includes>
+        <excludes>
+          <artifact scope="test" />
+          <artifact scope="provided" />
+          <artifact type="pom" />
+          <artifact groupId="nuxeo-studio" />
+          <!-- Filter out your artifacts using their groupId for instance -->
+          <artifact groupId="org.nuxeo.ecm.media.publishing*" />
+        </excludes>
       </artifact:set>
     </copy>
     <nx:rmdups dir="${outdir}/nxr/lib" />
-    <unzip src="${outdir}/nuxeo-nxr-server-${nuxeo.platform.version}.zip"
-           dest="${outdir}/nuxeo-nxr-all" />
-    <unzip src="${outdir}/nuxeo-nxr-jsf-ui-${nuxeo.platform.version}.zip"
-           dest="${outdir}/nuxeo-nxr-all" />
-    <zip destfile="${outdir}/nuxeo-nxr-all-${nuxeo.platform.version}.zip"
-         basedir="${outdir}/nuxeo-nxr-all" />
+    <!-- Temporary ZIP Nuxeo NXR to compare with base distribution NXR -->
     <zip destfile="${outdir}/nxr-${maven.project.version}.zip" basedir="${outdir}/nxr" />
-    <!-- Diff against Nuxeo Server + JSF UI -->
-    <nx:zipdiff file1="${outdir}/nxr-${maven.project.version}.zip"
-                file2="${outdir}/nuxeo-nxr-all-${nuxeo.platform.version}.zip"
-                ignoreContent="true"
-                includesfile="${outdir}/includes"
-                excludesfile="${outdir}/excludesfile"
-                patternsetid="media-publishing.versus.all">
-    </nx:zipdiff>
-    <unzip src="${outdir}/nxr-${maven.project.version}.zip" dest="${outdir}/marketplace/install">
-      <patternset refid="media-publishing.versus.all" />
-    </unzip>
 
-    <!-- Separate UI packages -->
-    <mkdir dir="${outdir}/marketplace/install/bundles-jsf-ui" />
-    <move todir="${outdir}/marketplace/install/bundles-jsf-ui">
-      <fileset dir="${outdir}/marketplace/install/bundles">
-        <include name="nuxeo-media-publishing-*jsf-*.jar" />
-      </fileset>
-    </move>
+    <!-- Your MP only needs to include files not already provided by the base distribution -->
+    <nx:zipdiff
+      file1="${outdir}/nxr-${maven.project.version}.zip"
+      file2="${outdir}/nuxeo-nxr-server-${nuxeo.platform.version}.zip"
+      includesfile="${outdir}/includes"
+      excludesfile="${outdir}/excludesfile"
+      patternsetid="nxr.versus.distribution"
+      ignoreContent="true"
+      ignoreContentPattern=".*\.jar$"></nx:zipdiff>
+    <unzip src="${outdir}/nxr-${maven.project.version}.zip" dest="${outdir}/marketplace/install">
+      <patternset refid="nxr.versus.distribution" />
+    </unzip>
 
     <!-- Generate install.xml content -->
     <!-- See documentation at http://doc.nuxeo.com/x/IgIz -->
@@ -93,10 +90,8 @@
     <if>
       <available file="${outdir}/marketplace/install/bundles" />
       <then>
-        <var name="install.bundles"
-             value="${line.separator}
-  &lt;update file=&quot;${package.root}/install/bundles&quot; todir=&quot;${env.bundles}&quot; /&gt;${line.separator}
-  &lt;update file=&quot;${package.root}/install/bundles-jsf-ui&quot; todir=&quot;${env.bundles}&quot; if=&quot;Packages.contains('nuxeo-jsf-ui')&quot; /&gt;"/>
+        <var name="install.bundles" value="${line.separator}
+  &lt;update file=&quot;${package.root}/install/bundles&quot; todir=&quot;${env.bundles}&quot; /&gt;" />
       </then>
     </if>
 
@@ -105,43 +100,43 @@
       <available file="${outdir}/marketplace/install/lib" />
       <then>
 
-        <var name="install.libs"
-             value="${line.separator}
+        <var name="install.libs" value="${line.separator}
   &lt;update file=&quot;${package.root}/install/lib&quot; todir=&quot;${env.lib}&quot; /&gt;" />
       </then>
     </if>
 
-    <var name="install.properties"
-         value="${line.separator}
-  &lt;copy file=&quot;${package.root}/install/artifacts-media-publishing.properties&quot;${line.separator}
-    todir=&quot;${env.server.home}/sdk&quot; overwrite=&quot;true&quot; /&gt;${line.separator}
-  &lt;copy file=&quot;${package.root}/install/test-artifacts-media-publishing.properties&quot;${line.separator}
-    todir=&quot;${env.server.home}/sdk&quot; overwrite=&quot;true&quot; /&gt;" />
+    <var name="install.templates" value="" />
+    <if>
+      <available file="${outdir}/marketplace/install/templates" />
+      <then>
+        <var
+          name="install.templates"
+          value="${line.separator}
+  &lt;copy dir=&quot;${package.root}/install/templates&quot; todir=&quot;${env.templates}&quot; overwrite=&quot;true&quot; /&gt;${line.separator}
+  &lt;config addtemplate=&quot;nuxeo-media-publishing&quot; /&gt;${line.separator}" />
+      </then>
+    </if>
 
     <copy file="src/main/resources/install.xml" todir="${outdir}/marketplace" overwrite="true">
       <filterset>
         <filter token="BUNDLES" value="${install.bundles}" />
         <filter token="LIBS" value="${install.libs}" />
-        <filter token="PROPERTIES" value="${install.properties}" />
+        <filter token="TEMPLATES" value="${install.templates}" />
       </filterset>
     </copy>
 
+    <!-- Studio Registries Extraction -->
     <nx:studioExtraction todir="${outdir}/marketplace">
-      <fileset dir="${outdir}/marketplace/install/bundles"/>
-      <fileset dir="${outdir}/marketplace/install/bundles-jsf-ui"/>
+      <fileset dir="${outdir}/marketplace/install/bundles" />
     </nx:studioExtraction>
 
-    <zip destfile="${outdir}/${maven.project.artifactId}-${maven.project.version}.zip"
-         basedir="${outdir}/marketplace" />
+    <zip destfile="${outdir}/${maven.project.artifactId}-${maven.project.version}.zip" basedir="${outdir}/marketplace" />
     <artifact:attach file="${outdir}/${maven.project.artifactId}-${maven.project.version}.zip" type="zip" />
 
     <!-- cleanups -->
     <delete dir="${outdir}/marketplace" failonerror="false" />
     <delete dir="${outdir}/nxr" failonerror="false" />
-    <delete dir="${outdir}/nuxeo-nxr-all" failonerror="false" />
-    <delete file="${outdir}/nuxeo-nxr-server-${nuxeo.platform.version}.zip" failonerror="false" />
-    <delete file="${outdir}/nuxeo-nxr-jsf-ui-${nuxeo.platform.version}.zip" failonerror="false" />
-    <delete file="${outdir}/nuxeo-nxr-all-${nuxeo.platform.version}.zip" failonerror="false" />
+    <delete file="${outdir}/nuxeo-nxr-server-${maven.project.version}.zip" failonerror="false" />
     <delete file="${outdir}/nxr-${maven.project.version}.zip" failonerror="false" />
   </target>
 

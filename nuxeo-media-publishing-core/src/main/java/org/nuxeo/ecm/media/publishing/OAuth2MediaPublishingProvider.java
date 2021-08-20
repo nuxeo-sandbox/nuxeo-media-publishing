@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2021 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@
 
 package org.nuxeo.ecm.media.publishing;
 
-import com.google.api.client.auth.oauth2.Credential;
 import org.nuxeo.ecm.media.publishing.adapter.PublishableMedia;
 import org.nuxeo.ecm.platform.oauth2.providers.NuxeoOAuth2ServiceProvider;
 import org.nuxeo.ecm.platform.oauth2.providers.OAuth2ServiceProvider;
 import org.nuxeo.ecm.platform.oauth2.providers.OAuth2ServiceProviderRegistry;
 import org.nuxeo.runtime.api.Framework;
+
+import com.google.api.client.auth.oauth2.Credential;
 
 /**
  * Abstract Media Publishing Provider using OAuth2
@@ -33,14 +34,15 @@ import org.nuxeo.runtime.api.Framework;
  */
 public abstract class OAuth2MediaPublishingProvider implements MediaPublishingProvider {
 
-    private final String providerName;
+    protected final String providerName;
 
     public OAuth2MediaPublishingProvider(String providerName) {
         this.providerName = providerName;
     }
 
     protected OAuth2ServiceProvider getOAuth2ServiceProvider() {
-        OAuth2ServiceProviderRegistry oAuth2ProviderRegistry = Framework.getService(OAuth2ServiceProviderRegistry.class);
+        OAuth2ServiceProviderRegistry oAuth2ProviderRegistry = Framework.getService(
+                OAuth2ServiceProviderRegistry.class);
         return oAuth2ProviderRegistry.getProvider(providerName);
     }
 
@@ -51,8 +53,8 @@ public abstract class OAuth2MediaPublishingProvider implements MediaPublishingPr
     @Override
     public boolean isAvailable() {
         NuxeoOAuth2ServiceProvider serviceProvider = (NuxeoOAuth2ServiceProvider) getOAuth2ServiceProvider();
-        return serviceProvider != null && serviceProvider.isEnabled() &&
-            serviceProvider.getClientSecret() != null && serviceProvider.getClientId() != null;
+        return serviceProvider != null && serviceProvider.isEnabled() && serviceProvider.getClientSecret() != null
+                && serviceProvider.getClientId() != null;
     }
 
     @Override

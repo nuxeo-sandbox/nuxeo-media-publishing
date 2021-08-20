@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2015 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2021 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,21 @@
 
 package org.nuxeo.ecm.media.publishing.adapter;
 
+import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ACCOUNT_PROPERTY_NAME;
+import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ID_PROPERTY_NAME;
+import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PROVIDERS_PROPERTY_NAME;
+import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PROVIDER_PROPERTY_NAME;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.media.publishing.MediaPublishingProvider;
 import org.nuxeo.ecm.media.publishing.MediaPublishingService;
 import org.nuxeo.runtime.api.Framework;
-
-import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ACCOUNT_PROPERTY_NAME;
-import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ID_PROPERTY_NAME;
-import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PROVIDER_PROPERTY_NAME;
-import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PROVIDERS_PROPERTY_NAME;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @since 7.3
