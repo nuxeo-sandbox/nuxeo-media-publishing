@@ -50,6 +50,7 @@ public class MediaUnpublishOp {
     @OperationMethod
     public DocumentModel run(DocumentModel doc)  {
         mediaPublishingService.unpublish(doc, service);
+        session.saveDocument(doc);
         return doc;
     }
 }

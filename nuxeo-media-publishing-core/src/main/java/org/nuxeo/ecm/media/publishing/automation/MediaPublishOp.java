@@ -82,6 +82,7 @@ public class MediaPublishOp {
                 //todo
             }
         });
+        session.saveDocument(doc);
         return doc;
     }
 }

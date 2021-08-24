@@ -55,6 +55,7 @@ public class TestMediaPublishingOp {
     public void testPublishOp() throws Exception {
         DocumentModel doc = session.createDocumentModel(session.getRootDocument().getPathAsString(), "File", "File");
         doc.addFacet(MediaPublishingConstants.PUBLISHABLE_MEDIA_FACET);
+        doc = session.createDocument(doc);
         OperationContext ctx = new OperationContext();
         ctx.setInput(doc);
         ctx.setCoreSession(session);
@@ -68,6 +69,7 @@ public class TestMediaPublishingOp {
     public void testUnpublishOp() throws Exception {
         DocumentModel doc = session.createDocumentModel(session.getRootDocument().getPathAsString(), "File", "File");
         doc.addFacet(MediaPublishingConstants.PUBLISHABLE_MEDIA_FACET);
+        doc = session.createDocument(doc);
         OperationContext ctx = new OperationContext();
         ctx.setInput(doc);
         ctx.setCoreSession(session);
