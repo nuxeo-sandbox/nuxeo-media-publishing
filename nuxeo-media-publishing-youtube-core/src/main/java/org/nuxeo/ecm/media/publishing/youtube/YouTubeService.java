@@ -20,7 +20,6 @@
 package org.nuxeo.ecm.media.publishing.youtube;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoListResponse;
@@ -62,24 +61,21 @@ public class YouTubeService extends OAuth2MediaPublishingProvider {
     @Override
     public String upload(PublishableMedia media, MediaPublishingProgressListener progressListener, String account, Map<String, String> options) throws IOException {
 
-        MediaHttpUploaderProgressListener mediaUploaderListener = new MediaHttpUploaderProgressListener() {
-            @Override
-            public void progressChanged(MediaHttpUploader uploader) throws IOException {
-                switch (uploader.getUploadState()) {
-                case INITIATION_STARTED:
-                case INITIATION_COMPLETE:
-                    progressListener.onStart();
-                    break;
-                case MEDIA_IN_PROGRESS:
-                    progressListener.onProgress(uploader.getProgress());
-                    break;
-                case MEDIA_COMPLETE:
-                    progressListener.onComplete();
-                    break;
-                case NOT_STARTED:
-                    log.info("Upload Not Started!");
-                    break;
-                }
+        MediaHttpUploaderProgressListener mediaUploaderListener = uploader -> {
+            switch (uploader.getUploadState()) {
+            case INITIATION_STARTED:
+            case INITIATION_COMPLETE:
+                progressListener.onStart();
+                break;
+            case MEDIA_IN_PROGRESS:
+                progressListener.onProgress(uploader.getProgress());
+                break;
+            case MEDIA_COMPLETE:
+                progressListener.onComplete();
+                break;
+            case NOT_STARTED:
+                log.info("Upload Not Started!");
+                break;
             }
         };
 
@@ -121,7 +117,11 @@ public class YouTubeService extends OAuth2MediaPublishingProvider {
     public boolean unpublish(PublishableMedia media) throws IOException {
         String account = media.getAccount(this.providerName);
         String mediaId = media.getId(this.providerName);
-        return getYouTubeClient(account).delete(mediaId);
+        if (!isMediaPublished(mediaId,account)) {
+            return true;
+        } else {
+            return getYouTubeClient(account).delete(mediaId);
+        }
     }
 
     @Override
@@ -165,7 +165,6 @@ public class YouTubeService extends OAuth2MediaPublishingProvider {
         if (client == null) {
             return false;
         }
-
         try {
             VideoListResponse list = client.getYouTube().videos().list("id").setId(mediaId).execute();
             return list.getItems().size() > 0;
