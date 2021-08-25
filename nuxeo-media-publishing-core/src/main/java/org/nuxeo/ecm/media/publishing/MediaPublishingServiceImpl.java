@@ -91,6 +91,7 @@ public class MediaPublishingServiceImpl extends DefaultComponent implements Medi
             evtProducer.fireEvent(event);
             return mediaId;
         } catch (IOException e) {
+            log.warn(e);
             throw new NuxeoException(e);
         }
     }
@@ -114,6 +115,7 @@ public class MediaPublishingServiceImpl extends DefaultComponent implements Medi
                 evtProducer.fireEvent(event);
             }
         } catch (IOException e) {
+            log.warn(e);
             throw new NuxeoException("Failed to unpublish media", e);
         }
     }
