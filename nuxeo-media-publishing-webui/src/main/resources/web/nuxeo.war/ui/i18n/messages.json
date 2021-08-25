@@ -1,3 +1,8 @@
 {
-  "dummy":"Dummy"
+  "label.action.youtube": "Publish to Youtube",
+  "label.action.youtube.title": "Video Title",
+  "label.action.youtube.description": "Description",
+  "label.action.youtube.visibility": "Visibility",
+  "label.action.publish": "Publish",
+  "label.action.unpublish": "Unpublish"
 }

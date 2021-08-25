@@ -21,11 +21,13 @@ package org.nuxeo.ecm.media.publishing.youtube;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatistics;
 import com.google.api.services.youtube.model.VideoStatus;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
@@ -83,16 +85,19 @@ public class YouTubeService extends OAuth2MediaPublishingProvider {
 
         VideoStatus status = new VideoStatus();
         String privacyStatus = options.get("privacyStatus");
-        if (privacyStatus != null) {
-            status.setPrivacyStatus(privacyStatus);
-        } else {
-            status.setPrivacyStatus("unlisted");
+        status.setPrivacyStatus(StringUtils.isNotEmpty(privacyStatus) ? privacyStatus : "unlisted");
+        String publishAt = options.get("publishAt");
+        if (StringUtils.isNotEmpty(publishAt)) {
+            status.setPublishAt(DateTime.parseRfc3339(publishAt));
         }
         youtubeVideo.setStatus(status);
 
         VideoSnippet snippet = new VideoSnippet();
-        snippet.setTitle(media.getTitle());
-        snippet.setDescription(media.getDescription());
+
+        String title = options.get("title");
+        snippet.setTitle(StringUtils.isNotEmpty(title) ? title : media.getTitle());
+        String description = options.get("description");
+        snippet.setDescription(StringUtils.isNotEmpty(description) ? description : media.getDescription());
 
         List<String> tags = new ArrayList<>();
         String inputTags = options.get("tags");

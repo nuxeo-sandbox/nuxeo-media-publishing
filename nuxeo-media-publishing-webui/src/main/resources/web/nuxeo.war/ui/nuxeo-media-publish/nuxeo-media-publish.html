@@ -15,3 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
+<link rel="import" href="actions/nuxeo-youtube-publish.html">
+
+<nuxeo-slot-content name="youtubePublish" slot="DOCUMENT_ACTIONS" order="46">
+    <template>
+        <nuxeo-filter document="[[document]]" facet="Video">
+            <template>
+                <nuxeo-youtube-publish icon="/nuxeo/img/youtube.svg" label="label.action.youtube" document="[[document]]"></nuxeo-youtube-publish>
+            </template>
+        </nuxeo-filter>
+    </template>
+</nuxeo-slot-content>

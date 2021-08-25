@@ -1,0 +1,285 @@
+<script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
+
+<!--
+`nuxeo-youtube-publish`
+@group Nuxeo UI
+@element nuxeo-youtube-publish
+-->
+<dom-module id="nuxeo-youtube-publish">
+    <template>
+        <style include="nuxeo-action-button-styles nuxeo-styles iron-flex iron-flex-alignment">
+            .content {
+                @apply --layout-vertical;
+            }
+
+            #progress {
+                margin: 0px;
+                margin-top: 16px;
+                padding: 0px;
+                width:100%;
+            }
+
+            .buttons {
+                margin-top: 0px;
+            }
+
+            *[role='widget'] {
+                display:block;
+                margin-bottom: 16px;
+            }
+
+            .logo {
+                height: 6rem;
+                display: block;
+                margin-right: 16px;
+            }
+
+        </style>
+
+        <nuxeo-resource id="oauth2"></nuxeo-resource>
+
+        <nuxeo-operation id="publishOp" op="MediaPublish" schemas="*" async></nuxeo-operation>
+        <nuxeo-operation id="unpublishOp" op="MediaUnpublish" schemas="*" async></nuxeo-operation>
+
+        <template is="dom-if" if="[[isAvailable]]">
+            <div class="action" on-tap="_toggleDialog">
+                <paper-icon-button id="bt" src="[[icon]]"></paper-icon-button>
+                <span class="label" hidden$="[[!showLabel]]">[[i18n(label)]]</span>
+            </div>
+            <paper-tooltip for="bt">[[i18n(label)]]</paper-tooltip>
+        </template>
+
+        <nuxeo-dialog id="dialog" on-iron-overlay-closed="_dialogClosed" with-backdrop>
+            <div class="layout horizontal">
+                <iron-icon class="logo" src="[[icon]]"></iron-icon>
+                <h2>[[i18n(label)]]</h2>
+            </div>
+            <div class="content">
+                <template is="dom-if" if="[[isUserAuthorized]]">
+                    <template is="dom-if" if="[[!isYoutubePublish(document)]]">
+                        <nuxeo-input role="widget" label="[[i18n('label.action.youtube.title')]]" value="{{options.title}}"></nuxeo-input>
+                        <nuxeo-textarea role="widget" label="[[i18n('label.action.youtube.description')]]" value="{{options.description}}"></nuxeo-textarea>
+                        <nuxeo-select role="widget"
+                                      name="visibility"
+                                      label="[[i18n('label.action.youtube.visibility')]]"
+                                      options="[[visibilityOptions]]" selected="{{options.privacyStatus}}">
+                        </nuxeo-select>
+                    </template>
+                    <template is="dom-if" if="[[isYoutubePublish(document)]]">
+                        <iframe src="[[_getYoutubeEmbedUrl(document)]]"></iframe>
+                    </template>
+                </template>
+                <template is="dom-if" if="[[!isUserAuthorized]]">
+                    <paper-button id="login" on-tap="_login">[[i18n('Login')]]</paper-button>
+                </template>
+            </div>
+
+            <paper-progress id="progress" indeterminate disabled></paper-progress>
+
+            <div class="buttons">
+                <paper-button noink dialog-dismiss on-tap="_close">Close</paper-button>
+                <template is="dom-if" if="[[isUserAuthorized]]">
+                    <paper-button id="action" on-tap="_do">[[_getActionLabel(document)]]</paper-button>
+                </template>
+            </div>
+        </nuxeo-dialog>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'nuxeo-youtube-publish',
+            behaviors: [Nuxeo.LayoutBehavior, Nuxeo.LiveConnectBehavior],
+            properties: {
+
+                label: {
+                    type: String,
+                    value: 'Action Label'
+                },
+
+                showLabel: {
+                    type: Boolean,
+                    value: false,
+                },
+
+                icon: {
+                    type: String,
+                    value: 'iconset_name:icon_name'
+                },
+
+                document: {
+                    type: Object,
+                    observer: "_documentChanged"
+                },
+
+                providerId: {
+                    value: 'youtube'
+                },
+
+                options: {
+                    type: Object,
+                    value: {
+                        "privacyStatus": "private"
+                    }
+                },
+
+                visibilityOptions: {
+                    type: Array,
+                    value: function() {
+                        return [
+                            {
+                                id: "public",
+                                label: "Public",
+                            },{
+                                id: "private",
+                                label: "Private",
+                            },{
+                                id: "unlisted",
+                                label: "Unlisted",
+                            }
+                        ];
+                    }
+                },
+
+            },
+
+            ready: function() {
+                this.updateProviderInfo();
+            },
+
+            _toggleDialog: function() {
+                this.$.dialog.toggle();
+            },
+
+            _login: function() {
+                this.openPopup(this.authorizationURL, {
+                    onMessageReceive: this._parseMessage.bind(this),
+                    onClose: this._onOAuthPopupClose.bind(this),
+                });
+            },
+
+            _doAuth(immediate, callback) {
+                const obj = {
+                    client_id: this.clientId,
+                    scope: 'email https://www.googleapis.com/auth/youtube',
+                };
+                if (this.userId) {
+                    obj.user_id = this.userId;
+                    obj.immediate = immediate;
+                } else {
+                    obj.authuser = -1;
+                }
+                if (this.domain) {
+                    obj.hd = this.domain;
+                }
+                gapi.auth.authorize(obj, callback);
+            },
+
+            _checkAuth() {
+                const token = gapi.auth.getToken();
+                if (token) {
+                    this._handleAuthResult(token.access_token);
+                } else {
+                    this._doAuth(false, this._checkAuth.bind(this));
+                }
+            },
+
+            _handleAuthResult(token) {
+                if (token) {
+                    const xhr = document.createElement('iron-request');
+                    xhr
+                        .send({ url: `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token= ${token}`, handleAs: 'json' })
+                        .then(() => {
+                            this.userId = xhr.response.email;
+                            this.updateProviderInfo();
+                        });
+                } else {
+                    this._checkAuth(false);
+                }
+            },
+
+            _parseMessage(event) {
+                const data = JSON.parse(event.data);
+                this.accessToken = data.token;
+            },
+
+            _onOAuthPopupClose() {
+                if (this.accessToken) {
+                    this._handleAuthResult(this.accessToken);
+                }
+            },
+
+            _getActionLabel: function(document) {
+                return !this.isYoutubePublish(document) ? this.i18n('label.action.publish') : this.i18n('label.action.unpublish');
+            },
+
+            _documentChanged: function(document) {
+                if (document) {
+                    this.options.title = document.properties['dc:title'],
+                        this.options.description = document.properties['dc:description']
+                }
+            },
+
+            _do: function() {
+                if (!this.isYoutubePublish(this.document)) {
+                    this._publish();
+                } else {
+                    this._unpublish();
+                }
+            },
+
+            _publish: function() {
+                this.$.publishOp.input = 'doc:' + this.document.uid;
+                this.$.publishOp.params = {
+                    service:"youtube",
+                    serviceLogin: this.userId,
+                    options: this.options
+                }
+
+                this.$.action.disabled = true;
+                this.$.progress.disabled = false;
+
+                this.$.publishOp.execute()
+                    .then((response) => {
+                        console.log("hello");
+                        this.document = response;
+                    }).catch((error) => {
+                    console.log(error);
+                }).finally(() => {
+                    this.$.progress.disabled = true;
+                    this.$.action.disabled = false;
+                });
+            },
+
+            _unpublish: function() {
+                this.$.unpublishOp.input = 'doc:' + this.document.uid;
+                this.$.unpublishOp.params = {
+                    service:"youtube",
+                }
+
+                this.$.action.disabled = true;
+                this.$.progress.disabled = false;
+
+                this.$.unpublishOp.execute()
+                    .then((response) => {
+                        this.document = response;
+                    }).catch((error) => {
+                    console.log(error);
+                }).finally(() => {
+                    this.$.progress.disabled = true;
+                    this.$.action.disabled = false;
+                });
+            },
+
+            _getYoutubeEmbedUrl: function(document) {
+                return "https://www.youtube.com/embed/" + document.properties['pm:providers'].find(element => element.provider === "youtube").externalId;
+            },
+
+            isYoutubePublish: function(document) {
+                return document && document.properties && document.properties['pm:providers'] && document.properties['pm:providers'].findIndex(element => element.provider === "youtube") >= 0;
+            }
+
+
+        });
+    </script>
+</dom-module>
