@@ -236,7 +236,7 @@
                     options: this.options
                 }
 
-                this.$.action.disabled = true;
+                this.shadowRoot.querySelector('#action').disabled = true;
                 this.$.progress.disabled = false;
 
                 this.$.publishOp.execute()
@@ -247,7 +247,7 @@
                     console.log(error);
                 }).finally(() => {
                     this.$.progress.disabled = true;
-                    this.$.action.disabled = false;
+                    this.shadowRoot.querySelector('#action').disabled = false;
                 });
             },
 
@@ -257,7 +257,7 @@
                     service:"youtube",
                 }
 
-                this.$.action.disabled = true;
+                this.shadowRoot.querySelector('#action').disabled = true;
                 this.$.progress.disabled = false;
 
                 this.$.unpublishOp.execute()
@@ -267,7 +267,7 @@
                     console.log(error);
                 }).finally(() => {
                     this.$.progress.disabled = true;
-                    this.$.action.disabled = false;
+                    this.shadowRoot.querySelector('#action').disabled = false;
                 });
             },
 
