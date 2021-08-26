@@ -240,10 +240,9 @@
                 this.$.progress.disabled = false;
 
                 this.$.publishOp.execute()
-                    .then((response) => {
-                        console.log("hello");
-                        this.document = response;
-                    }).catch((error) => {
+                .then((response) => {
+                    this.document = response;
+                }).catch((error) => {
                     console.log(error);
                 }).finally(() => {
                     this.$.progress.disabled = true;
@@ -261,9 +260,9 @@
                 this.$.progress.disabled = false;
 
                 this.$.unpublishOp.execute()
-                    .then((response) => {
-                        this.document = response;
-                    }).catch((error) => {
+                .then((response) => {
+                    this.document = response;
+                }).catch((error) => {
                     console.log(error);
                 }).finally(() => {
                     this.$.progress.disabled = true;
