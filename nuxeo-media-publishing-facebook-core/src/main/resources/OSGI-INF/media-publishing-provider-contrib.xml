@@ -1,0 +1,6 @@
+<component name="org.nuxeo.ecm.media.publishing.facebook.provider-contrib">
+  <extension target="org.nuxeo.ecm.media.publishing.MediaPublishingService"
+             point="providers" >
+    <provider id="facebook" enabled="true" service="org.nuxeo.ecm.media.publishing.facebook.FacebookProvider" />
+  </extension>
+</component>

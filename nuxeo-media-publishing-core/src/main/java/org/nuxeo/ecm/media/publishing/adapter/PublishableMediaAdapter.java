@@ -19,21 +19,29 @@
 
 package org.nuxeo.ecm.media.publishing.adapter;
 
-import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ACCOUNT_PROPERTY_NAME;
-import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ID_PROPERTY_NAME;
-import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PROVIDERS_PROPERTY_NAME;
-import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PROVIDER_PROPERTY_NAME;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.media.publishing.MediaPublishingProvider;
 import org.nuxeo.ecm.media.publishing.MediaPublishingService;
+import org.nuxeo.ecm.platform.picture.api.PictureView;
+import org.nuxeo.ecm.platform.picture.api.adapters.MultiviewPictureAdapter;
+import org.nuxeo.ecm.platform.video.TranscodedVideo;
+import org.nuxeo.ecm.platform.video.adapter.VideoDocumentAdapter;
 import org.nuxeo.runtime.api.Framework;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ACCOUNT_PROPERTY_NAME;
+import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ID_PROPERTY_NAME;
+import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PROVIDERS_PROPERTY_NAME;
+import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PROVIDER_PROPERTY_NAME;
+import static org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants.PICTURE_FACET;
+import static org.nuxeo.ecm.platform.video.VideoConstants.VIDEO_FACET;
 
 /**
  * @since 7.3
@@ -43,6 +51,17 @@ public class PublishableMediaAdapter implements PublishableMedia {
 
     public PublishableMediaAdapter(DocumentModel doc) {
         this.doc = doc;
+    }
+
+    @Override
+    public String getMediaType() {
+        if (doc.hasFacet(VIDEO_FACET)) {
+            return VIDEO_FACET;
+        } else if (doc.hasFacet(PICTURE_FACET)) {
+            return PICTURE_FACET;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -145,6 +164,36 @@ public class PublishableMediaAdapter implements PublishableMedia {
     @Override
     public Blob getBlob() {
         return doc.getAdapter(BlobHolder.class).getBlob();
+    }
+
+    @Override
+    public boolean isPicture() {
+        return doc.hasFacet(PICTURE_FACET);
+    }
+
+    @Override
+    public PictureView getPictureView(String viewName) {
+        return doc.getAdapter(MultiviewPictureAdapter.class).getView(viewName);
+    }
+
+    @Override
+    public List<PictureView> getAllViews() {
+        return Arrays.asList(doc.getAdapter(MultiviewPictureAdapter.class).getViews());
+    }
+
+    @Override
+    public boolean isVideo() {
+        return doc.hasFacet(VIDEO_FACET);
+    }
+
+    @Override
+    public List<TranscodedVideo> getTranscodedVideos() {
+        return new ArrayList<>(doc.getAdapter(VideoDocumentAdapter.class).getTranscodedVideos());
+    }
+
+    @Override
+    public TranscodedVideo getTranscodedVideo(String name) {
+        return doc.getAdapter(VideoDocumentAdapter.class).getTranscodedVideo(name);
     }
 
     @Override

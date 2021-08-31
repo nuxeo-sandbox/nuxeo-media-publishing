@@ -73,6 +73,7 @@ public class MediaPublishingServiceImpl extends DefaultComponent implements Medi
             entry.put(MediaPublishingConstants.ID_PROPERTY_NAME, mediaId);
             entry.put(MediaPublishingConstants.PROVIDER_PROPERTY_NAME, providerId);
             entry.put(MediaPublishingConstants.ACCOUNT_PROPERTY_NAME, account);
+            entry.put(MediaPublishingConstants.PERMALINK_PROPERTY_NAME,provider.getPublishedUrl(mediaId,account));
             media.putProvider(entry);
 
             CoreSession session = doc.getCoreSession();

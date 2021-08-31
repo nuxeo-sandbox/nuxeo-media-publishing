@@ -19,15 +19,20 @@
 
 package org.nuxeo.ecm.media.publishing.adapter;
 
+import org.nuxeo.ecm.core.api.Blob;
+import org.nuxeo.ecm.platform.picture.api.PictureView;
+import org.nuxeo.ecm.platform.video.TranscodedVideo;
+
 import java.util.List;
 import java.util.Map;
-
-import org.nuxeo.ecm.core.api.Blob;
 
 /**
  * @since 7.3
  */
 public interface PublishableMedia {
+
+    String getMediaType();
+
     Map<String, Object> getProvider(String provider);
 
     void putProvider(Map<String, Object> provider);
@@ -51,6 +56,18 @@ public interface PublishableMedia {
     String getDescription();
 
     Blob getBlob();
+
+    boolean isPicture();
+
+    PictureView getPictureView(String viewName);
+
+    List<PictureView> getAllViews();
+
+    boolean isVideo();
+
+    public List<TranscodedVideo> getTranscodedVideos();
+
+    public TranscodedVideo getTranscodedVideo(String name);
 
     String getUrl(String provider);
 

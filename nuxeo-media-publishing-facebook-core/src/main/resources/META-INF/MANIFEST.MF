@@ -1,0 +1,10 @@
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Manifest-Version: 1.0
+Bundle-Name: nuxeo-media-publishing-facebook-core
+Bundle-Vendor: Nuxeo
+Bundle-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: nuxeo-media-publishing-facebook-core
+Nuxeo-Component: OSGI-INF/media-publishing-provider-contrib.xml,
+ OSGI-INF/facebook-config.xml

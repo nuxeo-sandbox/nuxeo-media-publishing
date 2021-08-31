@@ -108,8 +108,9 @@ public class YouTubeService extends OAuth2MediaPublishingProvider {
 
         youtubeVideo.setSnippet(snippet);
 
-        // upload original video
-        Blob blob = media.getBlob();
+        // upload video
+        String renditionName = options.get("renditionName");
+        Blob blob = StringUtils.isNotEmpty(renditionName) ? media.getTranscodedVideo(renditionName).getBlob() : media.getBlob();
 
         String mimeType = blob.getMimeType();
         long length = blob.getLength();

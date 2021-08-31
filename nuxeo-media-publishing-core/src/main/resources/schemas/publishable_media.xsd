@@ -14,6 +14,7 @@
 
     <xs:complexType name="provider">
         <xs:sequence>
+            <xs:element name="permalink" type="xs:string"/>
             <xs:element name="externalId" type="xs:string"/>
             <xs:element name="provider" type="xs:string"/>
             <xs:element name="account" type="xs:string"/>

@@ -35,6 +35,10 @@
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.media.publishing</groupId>
+      <artifactId>nuxeo-media-publishing-facebook-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.ecm.media.publishing</groupId>
       <artifactId>nuxeo-media-publishing-webui</artifactId>
     </dependency>
   </dependencies>

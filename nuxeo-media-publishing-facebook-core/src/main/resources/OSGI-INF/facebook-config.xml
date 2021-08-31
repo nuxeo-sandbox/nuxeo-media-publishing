@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.ecm.media.publishing.facebook.oauth2">
+
+  <require>org.nuxeo.ecm.platform.oauth2.providers.OAuth2ServiceProviderRegistry</require>
+
+  <documentation>
+    Management of Facebook configuration.
+  </documentation>
+
+  <extension target="org.nuxeo.ecm.platform.oauth2.providers.OAuth2ServiceProviderRegistry" point="providers">
+    <provider>
+      <name>facebook</name>
+      <description>Facebook</description>
+      <class>org.nuxeo.ecm.media.publishing.facebook.FacebookOAuth2Provider</class>
+      <tokenServerURL>https://graph.facebook.com/v11.0/oauth/access_token</tokenServerURL>
+      <authorizationServerURL>https://www.facebook.com/v11.0/dialog/oauth</authorizationServerURL>
+      <scope>email</scope>
+      <scope>pages_show_list</scope>
+      <scope>pages_read_engagement</scope>
+      <scope>pages_manage_posts</scope>
+    </provider>
+  </extension>
+
+</component>

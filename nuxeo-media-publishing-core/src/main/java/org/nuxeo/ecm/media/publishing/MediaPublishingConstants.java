@@ -32,4 +32,6 @@ public class MediaPublishingConstants {
     public static final String ID_PROPERTY_NAME = "externalId";
 
     public static final String ACCOUNT_PROPERTY_NAME = "account";
+
+    public static final String PERMALINK_PROPERTY_NAME = "permalink";
 }

@@ -23,6 +23,7 @@
     <module>nuxeo-media-publishing-core</module>
     <module>nuxeo-media-publishing-wistia-core</module>
     <module>nuxeo-media-publishing-youtube-core</module>
+    <module>nuxeo-media-publishing-facebook-core</module>
     <module>nuxeo-media-publishing-package</module>
     <module>nuxeo-media-publishing-docker</module>
     <module>nuxeo-media-publishing-webui</module>
@@ -43,6 +44,11 @@
       <dependency>
         <groupId>org.nuxeo.ecm.media.publishing</groupId>
         <artifactId>nuxeo-media-publishing-youtube-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo.ecm.media.publishing</groupId>
+        <artifactId>nuxeo-media-publishing-facebook-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
