@@ -37,12 +37,7 @@ public class WistiaOAuth2ServiceProvider extends AbstractOAuth2UserEmailProvider
     private static final String ACCOUNT_INFO_URL = "https://api.wistia.com/v1/account.json";
 
     private static final HttpRequestFactory requestFactory =
-        HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
-            @Override
-            public void initialize(HttpRequest request) throws IOException {
-                request.setParser(new JsonObjectParser(JSON_FACTORY));
-            }
-        });
+        HTTP_TRANSPORT.createRequestFactory(request -> request.setParser(new JsonObjectParser(JSON_FACTORY)));
 
     @Override
     protected String getUserEmail(String accessToken) throws IOException {

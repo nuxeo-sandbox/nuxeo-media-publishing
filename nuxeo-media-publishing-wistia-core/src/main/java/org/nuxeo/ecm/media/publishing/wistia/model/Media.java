@@ -57,7 +57,7 @@ public class Media {
     protected Stats stats;
 
     @JsonProperty("assets")
-    protected List<Assets> assets = new ArrayList<Assets>();
+    protected List<Assets> assets = new ArrayList<>();
 
     public String getName() {
         return name;

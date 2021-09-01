@@ -53,7 +53,7 @@ public class Project {
 
     protected String publicId;
 
-    protected List<Media> medias = new ArrayList<Media>();
+    protected List<Media> medias = new ArrayList<>();
 
     public int getId() {
         return id;

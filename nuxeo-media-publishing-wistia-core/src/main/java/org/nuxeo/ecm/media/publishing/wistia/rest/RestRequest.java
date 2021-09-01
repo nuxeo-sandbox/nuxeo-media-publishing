@@ -39,7 +39,7 @@ public class RestRequest {
 
     protected String data;
 
-    protected Map<String, Object> headers = new HashMap<String, Object>();
+    protected Map<String, Object> headers = new HashMap<>();
 
     protected MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl();
 
