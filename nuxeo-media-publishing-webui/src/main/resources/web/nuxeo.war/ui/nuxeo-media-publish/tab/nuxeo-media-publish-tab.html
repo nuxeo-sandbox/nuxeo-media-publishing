@@ -1,0 +1,84 @@
+<!--
+`nuxeo-media-publish-tab`
+@group Nuxeo UI
+@element nuxeo-media-publish-tab
+-->
+<dom-module id="nuxeo-media-publish-tab">
+    <template>
+        <style include="nuxeo-styles iron-flex iron-flex-alignment">
+            .page,
+            .content {
+                @apply --layout-vertical;
+            }
+
+            .logo {
+                height:46px;
+            }
+
+            .link {
+                display: -webkit-flex;
+                display: flex;
+                align-items: center;
+            }
+
+        </style>
+
+        <div class="page">
+            <div class="content">
+                <template is="dom-if" if="[[_hasPublications(publications)]]">
+                    <template is="dom-repeat" items="[[publications]]">
+                        <paper-card>
+                            <div class="layout horizontal">
+                                <img src="/nuxeo/img/[[item.provider]].svg" class="logo">
+                                <a href="[[item.permalink]]" target="_blank" class="link">[[item.permalink]]</a>
+                            </div>
+                        </paper-card>
+                    </template>
+                </template>
+                <template is="dom-if" if="[[!_hasPublications(publications)]]">
+                    <paper-card>
+                        <div>
+                            This asset is not published on any external service.
+                        </div>
+                    </paper-card>
+                </template>
+            </div>
+        </div>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'nuxeo-media-publish-tab',
+            behaviors: [Nuxeo.LayoutBehavior],
+            properties: {
+                document: {
+                    type: Object
+                },
+
+                publications: {
+                    type: Array,
+                    computed: '_buildPublicationList(document)'
+                }
+
+            },
+
+            _buildPublicationList: function(document) {
+                if (!document || !document.properties || !document.properties["pm:providers"]) {
+                    return [];
+                } else {
+                    return document.properties["pm:providers"];
+                }
+            },
+
+            _hasPublications: function(publications) {
+                return publications.length > 0;
+            }
+
+
+            /**
+             * Here you can add your custom functions.
+             */
+        });
+    </script>
+</dom-module>
