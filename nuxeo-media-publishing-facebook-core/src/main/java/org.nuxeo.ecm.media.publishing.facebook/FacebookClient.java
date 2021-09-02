@@ -197,7 +197,11 @@ public class FacebookClient {
                             + IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
                 }
                 JSONObject object = new JSONObject(new JSONTokener(response.getEntity().getContent()));
-                return object.getString("permalink_url");
+                String url = object.getString("permalink_url");
+                if (url !=null && url.startsWith("/")) {
+                    url = "https://facebook.com" + url;
+                }
+                return url;
             }
         } catch (URISyntaxException | IOException e) {
             throw new NuxeoException(e);

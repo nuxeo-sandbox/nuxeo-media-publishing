@@ -90,6 +90,7 @@ public class TestFacebookProvider {
         assertNotNull(providerData.get(ID_PROPERTY_NAME));
         assertEquals(id,providerData.get(ID_PROPERTY_NAME));
         assertNotNull(providerData.get(PERMALINK_PROPERTY_NAME));
+        assertTrue(((String)providerData.get(PERMALINK_PROPERTY_NAME)).startsWith("https://"));
     }
 
     @Test
@@ -113,6 +114,7 @@ public class TestFacebookProvider {
         assertNotNull(providerData.get(ID_PROPERTY_NAME));
         assertEquals(id,providerData.get(ID_PROPERTY_NAME));
         assertNotNull(providerData.get(PERMALINK_PROPERTY_NAME));
+        assertTrue(((String)providerData.get(PERMALINK_PROPERTY_NAME)).startsWith("https://"));
     }
 
 }

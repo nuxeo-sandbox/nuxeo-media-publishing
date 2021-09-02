@@ -38,6 +38,7 @@ import java.util.Map;
 
 import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ACCOUNT_PROPERTY_NAME;
 import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ID_PROPERTY_NAME;
+import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PERMALINK_PROPERTY_NAME;
 import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PROVIDERS_PROPERTY_NAME;
 import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PROVIDER_PROPERTY_NAME;
 import static org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants.PICTURE_FACET;
@@ -85,6 +86,7 @@ public class PublishableMediaAdapter implements PublishableMedia {
             if (entry.get(PROVIDER_PROPERTY_NAME).equals(provider.get(PROVIDER_PROPERTY_NAME))) {
                 entry.put(ID_PROPERTY_NAME, provider.get(ID_PROPERTY_NAME));
                 entry.put(ACCOUNT_PROPERTY_NAME, provider.get(ACCOUNT_PROPERTY_NAME));
+                entry.put(PERMALINK_PROPERTY_NAME, provider.get(PERMALINK_PROPERTY_NAME));
                 providerExists = true;
                 break;
             }
