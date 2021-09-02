@@ -1,8 +1,15 @@
 {
   "label.action.youtube": "Publish to Youtube",
+  "label.action.facebook": "Publish to Facebook",
   "label.action.youtube.title": "Video Title",
   "label.action.youtube.description": "Description",
   "label.action.youtube.visibility": "Visibility",
   "label.action.publish": "Publish",
-  "label.action.unpublish": "Unpublish"
+  "label.action.publish.sucess": "Successfully Published",
+  "label.action.unpublish": "Unpublish",
+  "label.action.unpublish.sucess": "Successfully Unpublished",
+  "label.action.error": "An error occured, please try again or contact your application administrator",
+  "label.action.facebook.pages": "My Pages",
+  "label.action.publish.message": "Message",
+  "label.action.publish.rendition": "Rendition to publish"
 }

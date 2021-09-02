@@ -46,7 +46,7 @@ import static org.junit.Assert.assertTrue;
 import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.ID_PROPERTY_NAME;
 import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PERMALINK_PROPERTY_NAME;
 import static org.nuxeo.ecm.media.publishing.MediaPublishingConstants.PUBLISHABLE_MEDIA_FACET;
-import static org.nuxeo.ecm.media.publishing.facebook.FacebookClient.MESSAGE_KEY;
+import static org.nuxeo.ecm.media.publishing.facebook.FacebookClient.DESCRIPTION_KEY;
 import static org.nuxeo.ecm.media.publishing.facebook.FacebookClient.PAGE_ID_KEY;
 import static org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants.PICTURE_FACET;
 import static org.nuxeo.ecm.platform.video.VideoConstants.VIDEO_FACET;
@@ -80,7 +80,7 @@ public class TestFacebookProvider {
 
         Map<String, String> options = new HashMap<>();
         options.put(PAGE_ID_KEY, System.getProperty("facebookTestPageId"));
-        options.put(MESSAGE_KEY, "Hello Nuxeo!!!");
+        options.put(DESCRIPTION_KEY, "Hello Nuxeo!!!");
 
         String id = mediaPublishingService.publish(doc, FACEBOOK_TEST, session.getPrincipal().getName(), options, null);
 
@@ -103,7 +103,7 @@ public class TestFacebookProvider {
 
         Map<String, String> options = new HashMap<>();
         options.put(PAGE_ID_KEY, System.getProperty("facebookTestPageId"));
-        options.put(MESSAGE_KEY, "Hello Nuxeo!!!");
+        options.put(DESCRIPTION_KEY, "Hello Nuxeo!!!");
 
         String id = mediaPublishingService.publish(doc, FACEBOOK_TEST, session.getPrincipal().getName(), options, null);
 

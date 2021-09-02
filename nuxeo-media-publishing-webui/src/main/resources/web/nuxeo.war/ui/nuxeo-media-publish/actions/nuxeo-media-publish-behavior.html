@@ -1,0 +1,153 @@
+<script>
+    var Nuxeo = Nuxeo || {};
+    (function() {
+
+        /**
+         * @polymerBehavior Nuxeo.MediaPublishBehaviorImpl
+         */
+        Nuxeo.MediaPublishBehaviorImpl = {
+
+            properties: {
+
+                providerId: {
+                    type: String
+                },
+
+                document: {
+                    type: Object,
+                    observer: "_documentChanged"
+                },
+
+                availableRenditions: {
+                    type: Array,
+                    computed: '_buildAvailableRenditions(document)'
+                },
+
+                selectedRendition: {
+                    type: String
+                },
+
+                options: {
+                    type: Object,
+                    value: {}
+                }
+
+            },
+
+            _buildAvailableRenditions: function(document) {
+                let renditions = [];
+
+                if (document.facets.includes('Picture')) {
+                    document.properties['picture:views'].forEach((view, index) => {
+                        renditions.push({
+                            id: view.title,
+                            label: this.i18n(view.title)
+                        });
+                    });
+                } else if (document.facets.includes('Video')) {
+                    document.properties['vid:transcodedVideos'].forEach((video, index) => {
+                        renditions.push({
+                            id: video.name,
+                            label: this.i18n(video.name)
+                        });
+                    });
+                }
+
+                if (renditions.length > 0) {
+                    this.selectedRendition = renditions[0].id
+                }
+
+                return renditions;
+            },
+
+
+            _getEmbedUrl: function(document) {
+                return document.properties['pm:providers'].find(element => element.provider === this.providerId).permalink;
+            },
+
+            isPublished: function(document) {
+                return document && document.properties && document.properties['pm:providers'] && document.properties['pm:providers'].findIndex(element => element.provider === this.providerId) >= 0;
+            },
+
+            _getActionLabel: function(document) {
+                return !this.isYoutubePublish(document) ? this.i18n('label.action.publish') : this.i18n('label.action.unpublish');
+            },
+
+            _documentChanged: function(document) {
+                if (document) {
+                    this.options.title = document.properties['dc:title'],
+                        this.options.description = document.properties['dc:description']
+                }
+            },
+
+            _do: function() {
+                if (!this.isYoutubePublish(this.document)) {
+                    this._publish();
+                } else {
+                    this._unpublish();
+                }
+            },
+
+            _publish: function() {
+                this.$.publishOp.input = 'doc:' + this.document.uid;
+                this.$.publishOp.params = {
+                    service:this.providerId,
+                    serviceLogin: this.userId,
+                    options: this.options
+                }
+
+                this.shadowRoot.querySelector('#action').disabled = true;
+                this.$.progress.disabled = false;
+
+                this.$.publishOp.execute()
+                .then((response) => {
+                    this.fire('notify', {
+                        message: this.i18n('label.action.publish.sucess')
+                    });
+                    this._toggleDialog();
+                }).catch((error) => {
+                    console.log(error);
+                    this.fire('notify', {
+                        message: this.i18n('label.action.error')
+                    });
+                }).finally(() => {
+                    this.$.progress.disabled = true;
+                    this.shadowRoot.querySelector('#action').disabled = false;
+                });
+            },
+
+            _unpublish: function() {
+                this.$.unpublishOp.input = 'doc:' + this.document.uid;
+                this.$.unpublishOp.params = {
+                    service: this.providerId,
+                }
+
+                this.shadowRoot.querySelector('#action').disabled = true;
+                this.$.progress.disabled = false;
+
+                this.$.unpublishOp.execute()
+                .then((response) => {
+                    this.fire('notify', {
+                        message: this.i18n('label.action.unpublish.sucess')
+                    });
+                    this._toggleDialog();
+                }).catch((error) => {
+                    console.log(error);
+                    this.fire('notify', {
+                        message: this.i18n('label.action.error')
+                    });
+                }).finally(() => {
+                    this.$.progress.disabled = true;
+                    this.shadowRoot.querySelector('#action').disabled = false;
+                });
+            }
+        };
+
+        /** @polymerBehavior */
+        Nuxeo.MediaPublishBehavior = [
+            Nuxeo.LiveConnectBehavior, Nuxeo.MediaPublishBehaviorImpl
+        ];
+
+    })();
+</script>
+

@@ -16,13 +16,27 @@ limitations under the License.
 -->
 
 <link rel="import" href="actions/nuxeo-youtube-publish.html">
+<link rel="import" href="actions/nuxeo-facebook-publish.html">
 
 <nuxeo-slot-content name="youtubePublish" slot="DOCUMENT_ACTIONS" order="46">
     <template>
         <nuxeo-filter document="[[document]]" facet="Video">
             <template>
-                <nuxeo-youtube-publish icon="/nuxeo/img/youtube.svg" label="label.action.youtube" document="[[document]]"></nuxeo-youtube-publish>
+                <nuxeo-youtube-publish icon="/nuxeo/img/youtube.svg" label="label.action.youtube" document="[[document]]" provider-id="youtube"></nuxeo-youtube-publish>
             </template>
         </nuxeo-filter>
     </template>
 </nuxeo-slot-content>
+
+<nuxeo-slot-content name="facebookPublish" slot="DOCUMENT_ACTIONS" order="47">
+    <template>
+        <nuxeo-filter document="[[document]]" facet="Video,Picture">
+            <template>
+                <nuxeo-facebook-publish icon="/nuxeo/img/facebook.svg" label="label.action.facebook" document="[[document]]" provider-id="facebook"></nuxeo-facebook-publish>
+            </template>
+        </nuxeo-filter>
+    </template>
+</nuxeo-slot-content>
+
+
+

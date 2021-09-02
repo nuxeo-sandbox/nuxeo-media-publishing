@@ -1,0 +1,156 @@
+<link rel="import" href="nuxeo-media-publish-behavior.html">
+
+<script crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<!--
+`nuxeo-facebook-publish`
+@group Nuxeo UI
+@element nuxeo-facebook-publish
+-->
+<dom-module id="nuxeo-facebook-publish">
+    <template>
+        <style include="nuxeo-action-button-styles nuxeo-styles iron-flex iron-flex-alignment">
+            .content {
+                @apply --layout-vertical;
+            }
+
+            #progress {
+                margin: 0px;
+                margin-top: 16px;
+                padding: 0px;
+                width: 100%;
+            }
+
+            .buttons {
+                margin-top: 0px;
+            }
+
+            *[role='widget'] {
+                display: block;
+                margin-bottom: 16px;
+            }
+
+            .logo {
+                height: 6rem;
+                display: block;
+                margin-right: 16px;
+            }
+
+        </style>
+
+        <nuxeo-resource id="oauth2"></nuxeo-resource>
+
+        <nuxeo-operation id="publishOp" op="MediaPublish" schemas="*" async></nuxeo-operation>
+        <nuxeo-operation id="unpublishOp" op="MediaUnpublish" schemas="*" async></nuxeo-operation>
+
+        <template is="dom-if" if="[[isAvailable]]">
+            <div class="action" on-tap="_toggleDialog">
+                <paper-icon-button id="bt" src="[[icon]]"></paper-icon-button>
+                <span class="label" hidden$="[[!showLabel]]">[[i18n(label)]]</span>
+            </div>
+            <paper-tooltip for="bt">[[i18n(label)]]</paper-tooltip>
+        </template>
+
+        <nuxeo-dialog id="dialog" on-iron-overlay-closed="_dialogClosed" with-backdrop>
+            <div class="layout horizontal">
+                <iron-icon class="logo" src="[[icon]]"></iron-icon>
+                <h2>[[i18n(label)]]</h2>
+            </div>
+            <div class="content">
+                <template is="dom-if" if="[[isUserAuthorized]]">
+                    <nuxeo-select name="pageSelect" role="widget" label="[[i18n('label.action.facebook.pages')]]"
+                                  options="[[pages]]" selected="{{options.pageId}}"></nuxeo-select>
+
+                    <nuxeo-textarea role="widget" label="[[i18n('label.action.publish.message')]]"
+                                    value="{{options.description}}"></nuxeo-textarea>
+
+                    <nuxeo-select name="renditionSelect" role="widget"
+                                  label="[[i18n('label.action.publish.rendition')]]" options="[[availableRenditions]]"
+                                  selected="{{selectedRendition}}"></nuxeo-select>
+                </template>
+            </div>
+
+            <paper-progress id="progress" indeterminate disabled></paper-progress>
+
+            <div class="buttons">
+                <paper-button noink dialog-dismiss on-tap="_close">Close</paper-button>
+                <template is="dom-if" if="[[isUserAuthorized]]">
+                    <paper-button id="action" on-tap="_publish">[[i18n('label.action.publish')]]</paper-button>
+                </template>
+            </div>
+        </nuxeo-dialog>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'nuxeo-facebook-publish',
+            behaviors: [Nuxeo.LayoutBehavior, Nuxeo.MediaPublishBehavior],
+            properties: {
+
+                label: {
+                    type: String,
+                },
+
+                showLabel: {
+                    type: Boolean,
+                    value: false,
+                },
+
+                icon: {
+                    type: String
+                },
+
+                token: {
+                    type: String
+                },
+
+                pages: {
+                    type: Array,
+                    value: []
+                }
+            },
+
+            ready: function () {
+                this.updateProviderInfo().then(() => {
+                    if (this.isUserAuthorized) {
+                        this.$.oauth2.path = `oauth2/provider/${this.providerId}/token`;
+                        return this.$.oauth2.get().then((response) => {
+                            this.token = response.token;
+                        });
+                    } else {
+                        throw `user is not autorized for ${this.providerId}`;
+                    }
+                }).then(() => {
+                    FB.init({
+                        appId: this.clientId,
+                        status: true,
+                        xfbml: false,
+                        version: 'v2.7'
+                    });
+                    FB.api('/me/accounts', 'get', {access_token: this.token}, function (response) {
+                        console.log(response);
+                        let data = response.data;
+                        let pages = [];
+                        data.forEach(page => {
+                            pages.push({
+                                id: page.id,
+                                label: page.name
+                            })
+                        })
+                        this.pages = pages;
+                        this.options.pageId = pages[0].id;
+                    }.bind(this));
+                }).catch(error => {
+                    this.isUserAuthorized = false;
+                });
+            },
+
+            _toggleDialog: function () {
+                this.$.dialog.toggle();
+            }
+
+        });
+    </script>
+</dom-module>
+

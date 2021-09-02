@@ -51,7 +51,7 @@ public class FacebookClient {
 
     public static final String TITLE_KEY = "title";
 
-    public static final String MESSAGE_KEY = "message";
+    public static final String DESCRIPTION_KEY = "description";
 
     public static final String PHOTO_UPLOAD_URL = "https://graph.facebook.com/v11.0/%s/photos";
 
@@ -128,9 +128,9 @@ public class FacebookClient {
                                                                                                   blob.getMimeType()),
                                                                                           blob.getFilename());
 
-            String message = options.get(MESSAGE_KEY);
+            String message = options.get(DESCRIPTION_KEY);
             if (StringUtils.isNotBlank(message)) {
-                multipartEntityBuilder.addTextBody(MESSAGE_KEY, message);
+                multipartEntityBuilder.addTextBody("message", message);
             }
 
             HttpPost httpPost = new HttpPost(builder.build().toString());
@@ -164,7 +164,7 @@ public class FacebookClient {
                                                                                                   blob.getMimeType()),
                                                                                           blob.getFilename());
 
-            String message = options.get(MESSAGE_KEY);
+            String message = options.get(DESCRIPTION_KEY);
             if (StringUtils.isNotBlank(message)) {
                 multipartEntityBuilder.addTextBody("description", message);
             }
