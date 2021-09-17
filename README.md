@@ -4,11 +4,25 @@ This repository contains a plugin to publish assets to external services such as
 
 # How to build
 
+* Build with unit tests and  docker image:
+
 ```
 git clone https://github.com/nuxeo-sandbox/nuxeo-media-publishing
 cd nuxeo-media-publishing
 mvn clean install
 ```
+* To skip unit tests (you need to set access tokens, etc. and there may be limitations in the number of posts you can do, when you run the tests several times a day)
+
+```
+mvn -DskipTests=true clean install
+```
+
+* To build the plugin without building the Docker image, use:
+
+```
+mvn -DskipDocker=true clean install
+```
+
 
 # YouTube
 ## Google Cloud Console Configuration
