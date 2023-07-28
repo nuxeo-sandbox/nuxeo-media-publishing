@@ -26,4 +26,3 @@ USER 900
 COPY --chown=nuxeo:0 target/nuxeo-media-publishing-package-*.zip /home/nuxeo/local-packages/nuxeo-media-publishing-package.zip
 
 RUN /install-packages.sh --offline /home/nuxeo/local-packages/nuxeo-media-publishing-package.zip
-RUN /install-packages.sh --clid ${NUXEO_CLID} ${PACKAGES}
