@@ -1,4 +1,5 @@
 <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
+<link rel="import" href="nuxeo-media-publish-behavior.html">
 
 <!--
 `nuxeo-youtube-publish`
@@ -89,7 +90,7 @@
     <script>
         Polymer({
             is: 'nuxeo-youtube-publish',
-            behaviors: [Nuxeo.LayoutBehavior, Nuxeo.LiveConnectBehavior],
+            behaviors: [Nuxeo.LayoutBehavior, Nuxeo.MediaPublishBehavior],
             properties: {
 
                 label: {
@@ -226,48 +227,6 @@
                 } else {
                     this._unpublish();
                 }
-            },
-
-            _publish: function() {
-                this.$.publishOp.input = 'doc:' + this.document.uid;
-                this.$.publishOp.params = {
-                    service:"youtube",
-                    serviceLogin: this.userId,
-                    options: this.options
-                }
-
-                this.shadowRoot.querySelector('#action').disabled = true;
-                this.$.progress.disabled = false;
-
-                this.$.publishOp.execute()
-                .then((response) => {
-                    this.document = response;
-                }).catch((error) => {
-                    console.log(error);
-                }).finally(() => {
-                    this.$.progress.disabled = true;
-                    this.shadowRoot.querySelector('#action').disabled = false;
-                });
-            },
-
-            _unpublish: function() {
-                this.$.unpublishOp.input = 'doc:' + this.document.uid;
-                this.$.unpublishOp.params = {
-                    service:"youtube",
-                }
-
-                this.shadowRoot.querySelector('#action').disabled = true;
-                this.$.progress.disabled = false;
-
-                this.$.unpublishOp.execute()
-                .then((response) => {
-                    this.document = response;
-                }).catch((error) => {
-                    console.log(error);
-                }).finally(() => {
-                    this.$.progress.disabled = true;
-                    this.shadowRoot.querySelector('#action').disabled = false;
-                });
             },
 
             _getYoutubeEmbedUrl: function(document) {

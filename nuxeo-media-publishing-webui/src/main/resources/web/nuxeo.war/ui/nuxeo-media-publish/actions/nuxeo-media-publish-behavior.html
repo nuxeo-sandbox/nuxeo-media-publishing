@@ -104,6 +104,7 @@
                     this.fire('notify', {
                         message: this.i18n('label.action.publish.sucess')
                     });
+                    this.fire('document-updated');
                     this._toggleDialog();
                 }).catch((error) => {
                     console.log(error);
@@ -130,6 +131,7 @@
                     this.fire('notify', {
                         message: this.i18n('label.action.unpublish.sucess')
                     });
+                    this.fire('document-updated');
                     this._toggleDialog();
                 }).catch((error) => {
                     console.log(error);
