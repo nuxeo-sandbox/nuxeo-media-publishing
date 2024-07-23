@@ -18,6 +18,7 @@
       <scope>pages_show_list</scope>
       <scope>pages_read_engagement</scope>
       <scope>pages_manage_posts</scope>
+      <scope>pages_read_user_content</scope>
     </provider>
   </extension>
 

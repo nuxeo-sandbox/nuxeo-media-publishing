@@ -142,7 +142,7 @@ public class FacebookClient {
                             + IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
                 }
                 JSONObject json = new JSONObject(new JSONTokener(response.getEntity().getContent()));
-                return json.getString("post_id");
+                return String.format("%s:%s",pageId,json.getString("post_id"));
             }
         } catch (URISyntaxException | IOException e) {
             throw new NuxeoException(e);
@@ -178,17 +178,18 @@ public class FacebookClient {
                             + IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
                 }
                 JSONObject json = new JSONObject(new JSONTokener(response.getEntity().getContent()));
-                return json.getString("id");
+                return String.format("%s:%s",pageId,json.getString("id"));
             }
         } catch (URISyntaxException | IOException e) {
             throw new NuxeoException(e);
         }
     }
 
-    public String getPostPermalink(String postId) {
+    public String getPostPermalink(String postKey) {
+        String pageAccessToken = getPageToken(getPageIdFromPostKey(postKey));
         try {
-            URIBuilder builder = new URIBuilder(String.format(GET_POST_URL, postId));
-            builder.setParameter("access_token", accessToken);
+            URIBuilder builder = new URIBuilder(String.format(GET_POST_URL, getPostIdFromPostKey(postKey)));
+            builder.setParameter("access_token", pageAccessToken);
             builder.setParameter("fields", "permalink_url");
             HttpGet httpGet = new HttpGet(builder.build().toString());
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
@@ -208,10 +209,11 @@ public class FacebookClient {
         }
     }
 
-    public void deletePost(String postId) {
+    public void deletePost(String postKey) {
+        String pageAccessToken = getPageToken(getPageIdFromPostKey(postKey));
         try {
-            URIBuilder builder = new URIBuilder(String.format(GET_POST_URL, postId));
-            builder.setParameter("access_token", accessToken);
+            URIBuilder builder = new URIBuilder(String.format(GET_POST_URL, getPostIdFromPostKey(postKey)));
+            builder.setParameter("access_token", pageAccessToken);
             HttpDelete httpDelete = new HttpDelete(builder.build().toString());
             try (CloseableHttpResponse response = httpClient.execute(httpDelete)) {
                 if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
@@ -222,6 +224,16 @@ public class FacebookClient {
         } catch (URISyntaxException | IOException e) {
             throw new NuxeoException(e);
         }
+    }
+
+    public String getPageIdFromPostKey(String key) {
+        String[] parts = key.split(":");
+        return parts[0];
+    }
+
+    public String getPostIdFromPostKey(String key) {
+        String[] parts = key.split(":");
+        return parts[1];
     }
 
 }
