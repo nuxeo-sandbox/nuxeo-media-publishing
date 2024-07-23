@@ -4,8 +4,8 @@
     "promptValues": {
       "parent_package": "org.nuxeo.ecm.media.publishing",
       "parent_artifact": "nuxeo-media-publishing",
-      "parent_version": "2023.2.0-SNAPSHOT"
+      "parent_version": "2023.3.0-SNAPSHOT"
     },
-    "_nuxeo_version": "2023.2.0-SNAPSHOT"
+    "_nuxeo_version": "2023.3.0-SNAPSHOT"
   }
 }
