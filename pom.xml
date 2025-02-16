@@ -3,22 +3,22 @@
   <parent>
     <groupId>org.nuxeo</groupId>
     <artifactId>nuxeo-parent</artifactId>
-    <version>2023.6</version>
+    <version>2025.0.159</version>
   </parent>
   <groupId>org.nuxeo.ecm.media.publishing</groupId>
   <artifactId>nuxeo-media-publishing</artifactId>
-  <version>2023.3.0-SNAPSHOT</version>
+  <version>2025.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Nuxeo Media Publishing Parent</name>
   <properties>
-    <nuxeo.target.version>2023.*</nuxeo.target.version>
+    <nuxeo.target.version>2025.*</nuxeo.target.version>
     <google.youtube.version>v3-rev222-1.25.0</google.youtube.version>
     <skipDocker>false</skipDocker>
     <pushReleaseChanges>false</pushReleaseChanges>
   </properties>
   <modules>
     <module>nuxeo-media-publishing-core</module>
-    <module>nuxeo-media-publishing-wistia-core</module>
+    <!--module>nuxeo-media-publishing-wistia-core</module-->
     <module>nuxeo-media-publishing-youtube-core</module>
     <module>nuxeo-media-publishing-facebook-core</module>
     <module>nuxeo-media-publishing-package</module>
@@ -32,11 +32,11 @@
         <artifactId>nuxeo-media-publishing-core</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
+      <!--dependency>
         <groupId>org.nuxeo.ecm.media.publishing</groupId>
         <artifactId>nuxeo-media-publishing-wistia-core</artifactId>
         <version>${project.version}</version>
-      </dependency>
+      </dependency-->
       <dependency>
         <groupId>org.nuxeo.ecm.media.publishing</groupId>
         <artifactId>nuxeo-media-publishing-youtube-core</artifactId>

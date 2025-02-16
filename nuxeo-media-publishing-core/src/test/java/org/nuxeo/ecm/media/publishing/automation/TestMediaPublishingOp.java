@@ -21,7 +21,7 @@ package org.nuxeo.ecm.media.publishing.automation;
 
 import static org.junit.Assert.assertNotNull;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -20,7 +20,7 @@
 package org.nuxeo.ecm.media.publishing.wistia;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
@@ -32,7 +32,6 @@ import org.nuxeo.ecm.media.publishing.upload.MediaPublishingProgressListener;
 import org.nuxeo.ecm.media.publishing.wistia.model.Project;
 import org.nuxeo.ecm.media.publishing.wistia.model.Stats;
 
-import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;

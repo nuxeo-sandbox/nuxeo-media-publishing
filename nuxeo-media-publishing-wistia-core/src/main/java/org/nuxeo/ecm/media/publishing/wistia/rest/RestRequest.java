@@ -19,13 +19,8 @@
 
 package org.nuxeo.ecm.media.publishing.wistia.rest;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.sun.jersey.multipart.MultiPart;
+import jakarta.ws.rs.core.MultivaluedMap;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.HashMap;
 import java.util.Map;
 

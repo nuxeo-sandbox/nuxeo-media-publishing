@@ -19,12 +19,10 @@
 
 package org.nuxeo.ecm.media.publishing.wistia;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.MultiPart;
-import com.sun.jersey.multipart.file.FileDataBodyPart;
-import com.sun.jersey.multipart.file.StreamDataBodyPart;
+import jakarta.mail.BodyPart;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.nuxeo.ecm.media.publishing.wistia.model.Account;
 import org.nuxeo.ecm.media.publishing.wistia.model.Media;
 import org.nuxeo.ecm.media.publishing.wistia.model.Project;
@@ -34,8 +32,6 @@ import org.nuxeo.ecm.media.publishing.wistia.rest.RestResponse;
 import org.nuxeo.ecm.media.publishing.wistia.rest.WistiaResponseParser;
 import org.nuxeo.ecm.media.publishing.wistia.rest.RequestType;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
