@@ -49,15 +49,13 @@ public class FacebookClient {
 
     public static final String PAGE_ID_KEY = "pageId";
 
-    public static final String TITLE_KEY = "title";
-
     public static final String DESCRIPTION_KEY = "description";
 
-    public static final String PHOTO_UPLOAD_URL = "https://graph.facebook.com/v11.0/%s/photos";
+    public static final String PHOTO_UPLOAD_URL = "https://graph.facebook.com/v22.0/%s/photos";
 
-    public static final String VIDEO_UPLOAD_URL = "https://graph-video.facebook.com/v11.0/%s/videos";
+    public static final String VIDEO_UPLOAD_URL = "https://graph-video.facebook.com/v22.0/%s/videos";
 
-    public static final String GET_POST_URL = "https://graph.facebook.com/v11.0/%s";
+    public static final String GET_POST_URL = "https://graph.facebook.com/v22.0/%s";
 
     public static int timeoutInMs = 10 * 1000;
 
@@ -97,7 +95,7 @@ public class FacebookClient {
 
     public String getPageToken(String pageId) {
         JSONArray data = getAccounts();
-        if (data.length() == 0) {
+        if (data.isEmpty()) {
             throw new NuxeoException(String.format("Page %s not found", pageId));
         }
 

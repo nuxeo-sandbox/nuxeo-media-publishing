@@ -19,6 +19,8 @@
 
 package org.nuxeo.ecm.media.publishing.facebook;
 
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nuxeo.ecm.automation.test.AutomationFeature;
@@ -34,7 +36,7 @@ import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -71,6 +73,7 @@ public class TestFacebookProvider {
 
     @Test
     public void testPublishImage() {
+        Assume.assumeTrue(StringUtils.isNotBlank(System.getProperty("facebookTestAccessToken")));
         Blob blob = new FileBlob(new File(getClass().getResource("/files/snow.jpg").getPath()), "image/jpeg");
         DocumentModel doc = session.createDocumentModel(session.getRootDocument().getPathAsString(), "File", "File");
         doc.setPropertyValue("file:content", (Serializable) blob);
@@ -95,6 +98,7 @@ public class TestFacebookProvider {
 
     @Test
     public void testPublishVideo() {
+        Assume.assumeTrue(StringUtils.isNotBlank(System.getProperty("facebookTestAccessToken")));
         Blob blob = new FileBlob(new File(getClass().getResource("/files/beach.mp4").getPath()), "video/mp4");
         DocumentModel doc = session.createDocumentModel(session.getRootDocument().getPathAsString(), "File", "File");
         doc.setPropertyValue("file:content", (Serializable) blob);
