@@ -27,7 +27,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTube.Videos.Delete;
 import com.google.api.services.youtube.YouTube.Videos.Insert;
@@ -53,7 +53,7 @@ public class YouTubeClient {
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
 
     /** Global instance of the JSON factory. */
-    private static final JsonFactory JSON_FACTORY = new JacksonFactory();
+    private static final JsonFactory JSON_FACTORY =  GsonFactory.getDefaultInstance();
 
     YouTube youtube;
 
@@ -82,16 +82,16 @@ public class YouTubeClient {
     }
 
     public List<Video> getVideos() throws IOException {
-        return getYouTube().videos().list("snippet").execute().getItems();
+        return getYouTube().videos().list(List.of("snippet")).execute().getItems();
     }
 
     public List<Channel> getChannels() throws IOException {
-        return getYouTube().channels().list("snippet").setMine(true).execute().getItems();
+        return getYouTube().channels().list(List.of("snippet")).setMine(true).execute().getItems();
     }
 
     public List<PlaylistItem> getVideos(Channel channel) throws IOException {
         String id = channel.getId();
-        return getYouTube().playlistItems().list("snippet").setPlaylistId(id).execute().getItems();
+        return getYouTube().playlistItems().list(List.of("snippet")).setPlaylistId(id).execute().getItems();
     }
 
     public Video upload(Video video, InputStream stream, String type, long length,
@@ -100,7 +100,7 @@ public class YouTubeClient {
         InputStreamContent mediaContent = new InputStreamContent(type, stream);
         mediaContent.setLength(length);
 
-        Insert insert = getYouTube().videos().insert("snippet,status", video, mediaContent);
+        Insert insert = getYouTube().videos().insert(List.of("snippet","status"), video, mediaContent);
 
         // Set the upload type and add event listener.
         MediaHttpUploader uploader = insert.getMediaHttpUploader();
@@ -138,7 +138,7 @@ public class YouTubeClient {
         status.setPrivacyStatus(privacyStatus);
         youtubeVideo.setStatus(status);
 
-        getYouTube().videos().update("status", youtubeVideo).execute();
+        getYouTube().videos().update(List.of("status"), youtubeVideo).execute();
     }
 
     public boolean delete(String videoId) throws IOException {
@@ -147,13 +147,13 @@ public class YouTubeClient {
     }
 
     public VideoStatistics getStatistics(String videoId) throws IOException {
-        VideoListResponse list = getYouTube().videos().list("statistics").setId(videoId).execute();
+        VideoListResponse list = getYouTube().videos().list(List.of("statistics")).setId(List.of(videoId)).execute();
 
-        if (list.isEmpty() || list.getItems().size() == 0) {
+        if (list.isEmpty() || list.getItems().isEmpty()) {
             return null;
         }
 
-        Video video = list.getItems().get(0);
+        Video video = list.getItems().getFirst();
         return video.getStatistics();
     }
 }

@@ -12,7 +12,7 @@
   <name>Nuxeo Media Publishing Parent</name>
   <properties>
     <nuxeo.target.version>2025.*</nuxeo.target.version>
-    <google.youtube.version>v3-rev222-1.25.0</google.youtube.version>
+    <google.youtube.version>v3-rev20250128-2.0.0</google.youtube.version>
     <skipDocker>false</skipDocker>
     <pushReleaseChanges>false</pushReleaseChanges>
   </properties>

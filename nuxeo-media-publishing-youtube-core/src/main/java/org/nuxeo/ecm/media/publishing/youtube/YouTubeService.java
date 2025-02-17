@@ -172,8 +172,8 @@ public class YouTubeService extends OAuth2MediaPublishingProvider {
             return false;
         }
         try {
-            VideoListResponse list = client.getYouTube().videos().list("id").setId(mediaId).execute();
-            return list.getItems().size() > 0;
+            VideoListResponse list = client.getYouTube().videos().list(List.of("id")).setId(List.of(mediaId)).execute();
+            return !list.getItems().isEmpty();
         } catch (IOException e) {
             return false;
         }
