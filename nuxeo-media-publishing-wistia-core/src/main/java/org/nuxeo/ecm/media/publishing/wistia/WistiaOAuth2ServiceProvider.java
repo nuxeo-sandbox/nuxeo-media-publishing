@@ -19,12 +19,14 @@
 package org.nuxeo.ecm.media.publishing.wistia;
 
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.JsonObjectParser;
+
 import org.nuxeo.ecm.platform.oauth2.providers.AbstractOAuth2UserEmailProvider;
 
 import java.io.IOException;
@@ -42,9 +44,13 @@ public class WistiaOAuth2ServiceProvider extends AbstractOAuth2UserEmailProvider
     @Override
     protected String getUserEmail(String accessToken) throws IOException {
         GenericUrl url = new GenericUrl(ACCOUNT_INFO_URL);
-        url.set("api_password", accessToken);
+        
+        HttpRequest request = requestFactory.buildGetRequest(url);
 
-        HttpResponse response = requestFactory.buildGetRequest(url).execute();
+        HttpHeaders headers = request.getHeaders();
+        headers.setAuthorization("Bearer " + accessToken);
+
+        HttpResponse response = request.setHeaders(headers).execute();
         GenericJson json = response.parseAs(GenericJson.class);
         return (String) json.get("name");
     }

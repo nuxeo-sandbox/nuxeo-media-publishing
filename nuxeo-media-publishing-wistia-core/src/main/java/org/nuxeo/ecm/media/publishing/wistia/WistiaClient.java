@@ -42,33 +42,35 @@ import java.util.List;
 
 public class WistiaClient {
 
-    private static String BASE_URL = "https://api.wistia.com/v1";
+    private static final String BASE_URL = "https://api.wistia.com/v1";
 
-    private static String BASE_UPLOAD_URL = "https://upload.wistia.com";
+    private static final String BASE_UPLOAD_URL = "https://upload.wistia.com";
 
-    private static String BASE_EMBED_URL = "http://fast.wistia.net";
+    private static final String BASE_EMBED_URL = "http://fast.wistia.net";
 
-    protected String apiPassword;
+    protected final String apiToken;
 
-    protected WebResource dataService;
+    protected final WebResource dataService;
 
-    protected WebResource uploadService;
+    protected final WebResource uploadService;
 
-    protected WebResource embedService;
+    protected final WebResource embedService;
 
-    public WistiaClient(String apiPassword) {
-        this.apiPassword = apiPassword;
-        dataService = new Client().resource(BASE_URL).queryParam("api_password", apiPassword);
-        uploadService = new Client().resource(BASE_UPLOAD_URL).queryParam("api_password", apiPassword);
+    public WistiaClient(String apiToken) {
+        this.apiToken = apiToken;
+        dataService = new Client().resource(BASE_URL);
+        uploadService = new Client().resource(BASE_UPLOAD_URL);
         embedService = new Client().resource(BASE_EMBED_URL);
     }
 
     /**
      * Obtains a list of all the media in an account.
-     * @return
+     * 
+     * @return list of media
      */
     public List<Media> getMedias() {
-        RestResponse response = new RestRequest(dataService, "medias.json")
+        var response = new RestRequest(dataService, "medias.json")
+                .header("Authorization", "Bearer " + apiToken)
                 .execute();
 
         return WistiaResponseParser.asMediaList(response.getClientResponse());
@@ -76,11 +78,13 @@ public class WistiaClient {
 
     /**
      * Gets information about a specific piece of media uploaded to an account.
-     * @param hashedId
-     * @return
+     * 
+     * @param hashedId the media ID
+     * @return the media information
      */
     public Media getMedia(String hashedId) {
-        RestResponse response = new RestRequest(dataService, "medias/" + hashedId + ".json")
+        var response = new RestRequest(dataService, "medias/" + hashedId + ".json")
+                .header("Authorization", "Bearer " + apiToken)
                 .execute();
 
         return WistiaResponseParser.asMedia(response.getClientResponse());
@@ -88,13 +92,15 @@ public class WistiaClient {
 
     /**
      * Updates attributes on a piece of media.
-     * @param hashedId
-     * @param queryParams
-     * @return
+     * 
+     * @param hashedId the media ID
+     * @param queryParams parameters to update
+     * @return updated media information
      */
-    public Media updateMedia(String hashedId, MultivaluedMap<String,String> queryParams) {
-        RestResponse response = new RestRequest(dataService, "medias/" + hashedId + ".json")
+    public Media updateMedia(String hashedId, MultivaluedMap<String, String> queryParams) {
+        var response = new RestRequest(dataService, "medias/" + hashedId + ".json")
                 .requestType(RequestType.PUT)
+                .header("Authorization", "Bearer " + apiToken)
                 .queryParams(queryParams)
                 .execute();
 
@@ -103,25 +109,30 @@ public class WistiaClient {
 
     /**
      * Deletes a media from an account.
-     * @param hashedId
-     * @return
+     * 
+     * @param hashedId the media ID to delete
+     * @return deleted media information
      */
     public Media deleteMedia(String hashedId) {
-        RestResponse response = new RestRequest(dataService, "medias/" + hashedId + ".json")
+        var response = new RestRequest(dataService, "medias/" + hashedId + ".json")
                 .requestType(RequestType.DELETE)
+                .header("Authorization", "Bearer " + apiToken)
                 .execute();
 
         return WistiaResponseParser.asMedia(response.getClientResponse());
     }
 
     /**
-     * Aggregates tracking statistics for a video that has been embedded in a website.
-     * @param hashedId
-     * @return
+     * Aggregates tracking statistics for a video that has been embedded in a
+     * website.
+     * 
+     * @param hashedId the media ID
+     * @return statistics for the media
      */
     public Stats getMediaStats(String hashedId) {
-        RestResponse response = new RestRequest(dataService, "medias/" + hashedId + "/stats.json")
+        var response = new RestRequest(dataService, "medias/" + hashedId + "/stats.json")
                 .requestType(RequestType.GET)
+                .header("Authorization", "Bearer " + apiToken)
                 .execute();
 
         return WistiaResponseParser.asMedia(response.getClientResponse()).getStats();
@@ -129,10 +140,12 @@ public class WistiaClient {
 
     /**
      * Gets information about an account.
-     * @return
+     * 
+     * @return the account information
      */
     public Account getAccount() {
-        RestResponse response = new RestRequest(dataService, "account.json")
+        var response = new RestRequest(dataService, "account.json")
+                .header("Authorization", "Bearer " + apiToken)
                 .execute();
 
         return WistiaResponseParser.asAccount(response.getClientResponse());
@@ -140,10 +153,12 @@ public class WistiaClient {
 
     /**
      * Obtains a list of all the projects in an account.
-     * @return
+     * 
+     * @return list of projects
      */
     public List<Project> getProjects() {
-        RestResponse response = new RestRequest(dataService, "projects.json")
+        var response = new RestRequest(dataService, "projects.json")
+                .header("Authorization", "Bearer " + apiToken)
                 .execute();
 
         return WistiaResponseParser.asProjectList(response.getClientResponse());
@@ -151,11 +166,13 @@ public class WistiaClient {
 
     /**
      * Gets information about a specific project.
-     * @param hashedId
-     * @return
+     * 
+     * @param hashedId the project ID
+     * @return project information
      */
     public Project getProject(String hashedId) {
-        RestResponse response = new RestRequest(dataService, "projects/" + hashedId + ".json")
+        var response = new RestRequest(dataService, "projects/" + hashedId + ".json")
+                .header("Authorization", "Bearer " + apiToken)
                 .execute();
 
         return WistiaResponseParser.asProject(response.getClientResponse());
@@ -163,13 +180,15 @@ public class WistiaClient {
 
     /**
      * Creates a new project.
-     * @param name
-     * @param queryParams
-     * @return
+     * 
+     * @param name project name
+     * @param queryParams additional parameters
+     * @return the created project
      */
-    public Project createProject(String name, MultivaluedMap<String,String> queryParams) {
-        RestResponse response = new RestRequest(dataService, "projects.json")
+    public Project createProject(String name, MultivaluedMap<String, String> queryParams) {
+        var response = new RestRequest(dataService, "projects.json")
                 .requestType(RequestType.POST)
+                .header("Authorization", "Bearer " + apiToken)
                 .queryParams(queryParams)
                 .queryParam("name", name)
                 .execute();
@@ -179,13 +198,15 @@ public class WistiaClient {
 
     /**
      * Updates attributes on a project.
-     * @param hashedId
-     * @param queryParams
-     * @return
+     * 
+     * @param hashedId the project ID
+     * @param queryParams parameters to update
+     * @return updated project information
      */
-    public Project updateProject(String hashedId, MultivaluedMap<String,String> queryParams) {
-        RestResponse response = new RestRequest(dataService, "projects/" + hashedId + ".json")
+    public Project updateProject(String hashedId, MultivaluedMap<String, String> queryParams) {
+        var response = new RestRequest(dataService, "projects/" + hashedId + ".json")
                 .requestType(RequestType.PUT)
+                .header("Authorization", "Bearer " + apiToken)
                 .queryParams(queryParams)
                 .execute();
 
@@ -194,12 +215,14 @@ public class WistiaClient {
 
     /**
      * Deletes a project from an account.
-     * @param hashedId
-     * @return
+     * 
+     * @param hashedId the project ID to delete
+     * @return deleted project information
      */
     public Project deleteProject(String hashedId) {
-        RestResponse response = new RestRequest(dataService, "projects/" + hashedId + ".json")
+        var response = new RestRequest(dataService, "projects/" + hashedId + ".json")
                 .requestType(RequestType.DELETE)
+                .header("Authorization", "Bearer " + apiToken)
                 .execute();
 
         return WistiaResponseParser.asProject(response.getClientResponse());
@@ -207,14 +230,16 @@ public class WistiaClient {
 
     /**
      * Uploads a file from URL.
-     * @param url
-     * @param queryParams
-     * @return
+     * 
+     * @param url file URL
+     * @param queryParams additional parameters
+     * @return uploaded media information
      */
     public Media upload(String url, MultivaluedMap<String, String> queryParams) {
-        RestResponse response = new RestRequest(uploadService, "")
+        var response = new RestRequest(uploadService, "")
                 .requestType(RequestType.POST)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .header("Authorization", "Bearer " + apiToken)
                 .queryParams(queryParams)
                 .queryParam("url", url)
                 .execute();
@@ -224,43 +249,53 @@ public class WistiaClient {
 
     /**
      * Uploads a file.
-     * @param file
-     * @param queryParams
-     * @return
+     * 
+     * @param file the file to upload
+     * @param queryParams additional parameters
+     * @return uploaded media information
      */
     public Media upload(File file, MultivaluedMap<String, String> queryParams) {
-        FileDataBodyPart bodyPart = new FileDataBodyPart(file.getName(),
+        var bodyPart = new FileDataBodyPart(file.getName(),
                 file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
         return upload(bodyPart, queryParams);
     }
 
     /**
      * Uploads a file.
-     * @param stream
-     * @param queryParams
-     * @return
+     * 
+     * @param filename the name of the file
+     * @param stream input stream of file data
+     * @param queryParams additional parameters
+     * @return uploaded media information
      */
     public Media upload(String filename, InputStream stream, MultivaluedMap<String, String> queryParams) {
-        StreamDataBodyPart bodyPart = new StreamDataBodyPart(filename,
-            stream, filename, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        var bodyPart = new StreamDataBodyPart(filename,
+                stream, filename, MediaType.APPLICATION_OCTET_STREAM_TYPE);
         return upload(bodyPart, queryParams);
     }
 
     private Media upload(BodyPart bodyPart, MultivaluedMap<String, String> queryParams) {
-        MultiPart multiPart = new MultiPart();
+        var multiPart = new MultiPart();
         multiPart.bodyPart(bodyPart);
 
-        RestResponse response = new RestRequest(uploadService, "")
-            .requestType(RequestType.POST)
-            .contentType(MediaType.MULTIPART_FORM_DATA)
-            .queryParams(queryParams)
-            .execute(multiPart);
+        var response = new RestRequest(uploadService, "")
+                .requestType(RequestType.POST)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .header("Authorization", "Bearer " + apiToken)
+                .queryParams(queryParams)
+                .execute(multiPart);
 
         return WistiaResponseParser.asMedia(response.getClientResponse());
     }
 
+    /**
+     * Gets embed code for media URL.
+     * 
+     * @param mediaUrl the media URL
+     * @return the embed HTML code or null if not available
+     */
     public String getEmbedCode(String mediaUrl) {
-        RestResponse response = new RestRequest(embedService, "oembed")
+        var response = new RestRequest(embedService, "oembed")
                 .queryParam("url", mediaUrl)
                 .execute();
 
