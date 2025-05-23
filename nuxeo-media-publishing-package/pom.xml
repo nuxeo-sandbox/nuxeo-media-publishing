@@ -8,8 +8,9 @@
   </parent>
 
   <artifactId>nuxeo-media-publishing-package</artifactId>
+  <name>Nuxeo Media Publishing Package</name>
+  <description>Nuxeo Media Publishing Package</description>
   <packaging>zip</packaging>
-  <name>Nuxeo media publishing package - Nuxeo media publishing</name>
 
   <dependencies>
     <!-- Base distribution(s) for the MP -->
