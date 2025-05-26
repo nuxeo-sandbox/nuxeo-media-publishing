@@ -1,5 +1,6 @@
 {
   "label.action.youtube": "Publish to Youtube",
+  "label.action.wistia": "Publish to Wistia",
   "label.action.facebook": "Publish to Facebook",
   "label.action.youtube.title": "Video Title",
   "label.action.youtube.description": "Description",
