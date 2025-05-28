@@ -54,8 +54,10 @@ public class WistiaService extends OAuth2MediaPublishingProvider {
     }
 
     public WistiaClient getWistiaClient(String account) {
+        log.debug("Getting Wistia client for account: " + account);
         Credential credential = getCredential(account);
         if (credential == null) {
+            log.warn("No credential found for account: " + account);
             return null;
         }
         try {
@@ -64,25 +66,41 @@ public class WistiaService extends OAuth2MediaPublishingProvider {
             Long expiresIn = credential.getExpiresInSeconds();
             // check if token will expire in a minute
             if (credential.getAccessToken() == null || expiresIn != null && expiresIn <= 60) {
+                log.info("Refreshing access token for account: " + account + " (expires in: " + expiresIn + " seconds)");
                 credential.refreshToken();
                 if (credential.getAccessToken() == null) {
                     // nothing we can do without an access token
+                    log.error("Failed to refresh access token for account: " + account);
                     throw new NuxeoException("Failed to refresh access token");
                 }
+                log.info("Successfully refreshed access token for account: " + account);
             }
         } catch (IOException e) {
+            log.error("Error refreshing access token for account: " + account, e);
             throw new NuxeoException(e.getMessage(), e);
         }
 
+        log.debug("Successfully created Wistia client for account: " + account);
         return new WistiaClient(credential.getAccessToken());
     }
 
     @Override
     public String upload(PublishableMedia media, MediaPublishingProgressListener progressListener, String account, Map<String, String> options) throws IOException {
-        MultivaluedMap<String, String> params = new MultivaluedMapImpl();
+        log.info("Starting upload for media: " + media.getTitle() + " to account: " + account);
+        log.debug("Upload options: " + options);
 
-        params.putSingle("name", media.getTitle());
-        params.putSingle("description", media.getDescription());
+        String projectId = options.get("project_id");
+        if (projectId == null || projectId.isEmpty()) {
+            log.warn("No project ID provided, using default project.");
+            List<Project> projects = getProjects(account);
+            if (projects.isEmpty()) {
+                log.error("No projects found for account: " + account);
+                throw new NuxeoException("No projects available for account: " + account);
+            }
+            projectId = String.valueOf(projects.get(0).getId());
+        }
+        
+        MultivaluedMap<String, String> params = new MultivaluedMapImpl();
 
         for (Entry<String, String> entry : options.entrySet()) {
             if (entry.getValue() != null && entry.getValue().length() > 0) {
@@ -92,9 +110,11 @@ public class WistiaService extends OAuth2MediaPublishingProvider {
 
         // upload original video
         Blob blob = media.getBlob();
+        log.info("Uploading blob: " + blob.getFilename() + " (size: " + blob.getLength() + " bytes)");
 
         Media video = getWistiaClient(account).upload(blob.getFilename(), blob.getStream(), params);
-
+        
+        log.info("Successfully uploaded media. Wistia ID: " + video.getHashedId());
         return video.getHashedId();
     }
 
@@ -102,33 +122,61 @@ public class WistiaService extends OAuth2MediaPublishingProvider {
     public boolean unpublish(PublishableMedia media) {
         String account = media.getAccount(this.providerName);
         String mediaId = media.getId(this.providerName);
-        return getWistiaClient(account).deleteMedia(mediaId) != null;
+        log.info("Unpublishing media ID: " + mediaId + " from account: " + account);
+        
+        boolean result = getWistiaClient(account).deleteMedia(mediaId) != null;
+        
+        if (result) {
+            log.info("Successfully unpublished media ID: " + mediaId);
+        } else {
+            log.warn("Failed to unpublish media ID: " + mediaId);
+        }
+        
+        return result;
     }
 
     @Override
     public String getPublishedUrl(String mediaId, String account) {
+        log.debug("Getting published URL for media ID: " + mediaId + " from account: " + account);
         WistiaClient client = getWistiaClient(account);
-        return client == null ? null : client.getAccount().getUrl() + "/medias/" + mediaId;
+        if (client == null) {
+            log.warn("Cannot get published URL - no client available for account: " + account);
+            return null;
+        }
+        String url = client.getAccount().getUrl() + "/medias/" + mediaId;
+        log.debug("Published URL: " + url);
+        return url;
     }
 
     @Override
     public String getEmbedCode(String mediaId, String account) {
+        log.debug("Getting embed code for media ID: " + mediaId + " from account: " + account);
         WistiaClient client = getWistiaClient(account);
-        return client == null ? null : client.getEmbedCode(getPublishedUrl(mediaId, account));
+        if (client == null) {
+            log.warn("Cannot get embed code - no client available for account: " + account);
+            return null;
+        }
+        String embedCode = client.getEmbedCode(getPublishedUrl(mediaId, account));
+        log.debug("Successfully retrieved embed code for media ID: " + mediaId);
+        return embedCode;
     }
 
     @Override
     public Map<String, String> getStats(String mediaId, String account) {
+        log.debug("Getting stats for media ID: " + mediaId + " from account: " + account);
         WistiaClient client = getWistiaClient(account);
         if (client == null) {
+            log.warn("Cannot get stats - no client available for account: " + account);
             return null;
         }
 
         Stats stats = client.getMediaStats(mediaId);
         if (stats == null) {
+            log.warn("No stats available for media ID: " + mediaId);
             return null;
         }
 
+        log.debug("Retrieved stats for media ID: " + mediaId + " - visitors: " + stats.getVisitors() + ", plays: " + stats.getPlays());
         Map<String, String> map = new HashMap<>();
         map.put("label.mediaPublishing.stats.visitors", Integer.toString(stats.getVisitors()));
         map.put("label.mediaPublishing.stats.plays", Integer.toString(stats.getPlays()));
@@ -140,17 +188,28 @@ public class WistiaService extends OAuth2MediaPublishingProvider {
 
     @Override
     public boolean isMediaPublished(String mediaId, String account) {
+        log.debug("Checking if media is published - ID: " + mediaId + " account: " + account);
         WistiaClient client = getWistiaClient(account);
         if (client == null) {
+            log.warn("Cannot check publication status - no client available for account: " + account);
             return false;
         }
 
         Media media = client.getMedia(mediaId);
-        return media != null;
+        boolean isPublished = media != null;
+        log.debug("Media " + mediaId + " publication status: " + isPublished);
+        return isPublished;
     }
 
     public List<Project> getProjects(String account) {
+        log.debug("Getting projects for account: " + account);
         WistiaClient client = getWistiaClient(account);
-        return client == null ? Collections.emptyList() : client.getProjects();
+        if (client == null) {
+            log.warn("Cannot get projects - no client available for account: " + account);
+            return Collections.emptyList();
+        }
+        List<Project> projects = client.getProjects();
+        log.info("Retrieved " + projects.size() + " projects for account: " + account);
+        return projects;
     }
 }

@@ -1,8 +1,6 @@
 <link rel="import" href="nuxeo-media-publish-behavior.html">
 
 <script src="//fast.wistia.com/assets/external/api.js" async></script>
-<script src="https://fast.wistia.com/player.js" async></script>
-<script src="https://fast.wistia.com/embed/17ob3onis3.js" async type="module"></script>
 
 <!--
 `nuxeo-wistia-publish`
@@ -42,12 +40,6 @@
                 width: 100%;
                 aspect-ratio: 1.666;
             }
-
-            wistia-player[media-id='17ob3onis3']:not(:defined) {
-                background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/17ob3onis3/swatch');
-                display: block;
-                filter: blur(5px);
-            }
         </style>
 
         <nuxeo-resource id="oauth2"></nuxeo-resource>
@@ -71,17 +63,23 @@
             <div class="content">
                 <template is="dom-if" if="[[isUserAuthorized]]">
                     <template is="dom-if" if="[[!isWistiaPublish(document)]]">
-                        <nuxeo-input role="widget" label="[[i18n('label.action.wistia.title')]]"
-                            value="{{options.title}}"></nuxeo-input>
+                        <nuxeo-input role="widget" label="[[i18n('label.action.wistia.name')]]"
+                            value="{{options.name}}"></nuxeo-input>
                         <nuxeo-textarea role="widget" label="[[i18n('label.action.wistia.description')]]"
                             value="{{options.description}}"></nuxeo-textarea>
-                        <nuxeo-select role="widget" name="visibility" label="[[i18n('label.action.wistia.visibility')]]"
-                            options="[[visibilityOptions]]" selected="{{options.privacyStatus}}">
-                        </nuxeo-select>
+                        <nuxeo-select role="widget" label="[[i18n('label.action.wistia.project')]]"
+                            options="[[projects]]" selected="{{options.project_id}}"></nuxeo-select>
                     </template>
                     <template is="dom-if" if="[[isWistiaPublish(document)]]">
-                        <wistia-player media-id="17ob3onis3" wistia-popover="true" aspect="1.7777777777777777"
-                            style="width: 150px;height: 84px;"></wistia-player>
+                        <div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;">
+                            <div class="wistia_responsive_wrapper"
+                                style="height:100%;left:0;position:absolute;top:0;width:100%;"><iframe
+                                    src="https://fast.wistia.net/embed/iframe/[[_getWistiaMediaId(document)]]?web_component=true&seo=false"
+                                    title="Earth Video" allow="autoplay; fullscreen" allowtransparency="true"
+                                    frameborder="0" scrolling="no" class="wistia_embed" name="wistia_embed" width="100%"
+                                    height="100%"></iframe></div>
+                        </div>
+                        <script src="https://fast.wistia.net/player.js" async></script>
                     </template>
                 </template>
                 <template is="dom-if" if="[[!isUserAuthorized]]">
@@ -125,10 +123,26 @@
                 providerId: {
                     value: 'wistia'
                 },
+                projects: {
+                    type: Array,
+                    value: function () { return []; }
+                },
             },
 
             ready: function () {
-                this.updateProviderInfo();
+                this.updateProviderInfo().then(() => {
+                    if (this.isUserAuthorized) {
+                        // If user is already authorized, we need to get the access token
+                        // and fetch projects
+                        this.$.oauth2.path = `oauth2/provider/${this.providerId}/token`;
+                        return this.$.oauth2.get().then((response) => {
+                            this.accessToken = response.token;
+                            this._getProjects();
+                        });
+                    }
+                }).catch((error) => {
+                    console.warn('User is not authorized for Wistia or error occurred:', error);
+                });
             },
 
             _toggleDialog: function () {
@@ -137,22 +151,22 @@
 
             _login: function () {
                 // Create Wistia authorization URL with proper parameters
-                const authUrl = 'https://api.wistia.com/oauth/authorize?' + 
-                    'client_id=' + encodeURIComponent(this.clientId) + 
-                    '&redirect_uri=' + encodeURIComponent(this.redirectUri) + 
+                const authUrl = 'https://api.wistia.com/oauth/authorize?' +
+                    'client_id=' + encodeURIComponent(this.clientId) +
+                    '&redirect_uri=' + encodeURIComponent(this.redirectUri) +
                     '&response_type=code' +
                     '&scope=all:all';
-                
+
                 this.openPopup(authUrl, {
                     onMessageReceive: this._parseMessage.bind(this),
                     onClose: this._onOAuthPopupClose.bind(this),
                 });
             },
-            
+
             _parseMessage(event) {
                 try {
                     const data = JSON.parse(event.data);
-                    
+
                     // Handle authorization code from popup
                     if (data.code) {
                         this._getAccessToken(data.code);
@@ -163,7 +177,7 @@
                     console.error('Error parsing message:', e);
                 }
             },
-            
+
             _getAccessToken(code) {
                 // Exchange authorization code for access token using form data
                 const formData = new URLSearchParams();
@@ -172,16 +186,16 @@
                 formData.append('grant_type', 'authorization_code');
                 formData.append('code', code);
                 formData.append('redirect_uri', this.redirectUri);
-                
+
                 this.$.oauth2.path = '/oauth/token';
                 this.$.oauth2.method = 'POST';
                 this.$.oauth2.url = 'https://api.wistia.com/oauth/token';
                 this.$.oauth2.body = formData.toString();
-                
+
                 this.$.oauth2.headers = {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 };
-                
+
                 this.$.oauth2.execute()
                     .then((response) => {
                         this.accessToken = response.access_token;
@@ -192,24 +206,27 @@
                         console.error('Error getting access token:', error);
                     });
             },
-            
+
             _handleAuthResult(token) {
                 if (token) {
                     // Store token and update UI
                     this.isUserAuthorized = true;
                     this.updateProviderInfo();
-                    
+
                     // Store token in provider info for future API calls
                     if (!this.provider) {
                         this.provider = {};
                     }
                     this.provider.token = token;
+
+                    // Fetch projects now that we have a valid token
+                    this._getProjects();
                 } else {
                     this.isUserAuthorized = false;
                 }
             },
-            
-            _onOAuthPopupClose() {},
+
+            _onOAuthPopupClose() { },
 
             _getActionLabel: function (document) {
                 return !this.isWistiaPublish(document) ? this.i18n('label.action.publish') : this.i18n('label.action.unpublish');
@@ -217,8 +234,8 @@
 
             _documentChanged: function (document) {
                 if (document) {
-                    this.options.title = document.properties['dc:title'],
-                        this.options.description = document.properties['dc:description']
+                    this.options.name = document.properties['dc:title']
+                    this.options.description = document.properties['dc:description']
                 }
             },
 
@@ -230,8 +247,40 @@
                 }
             },
 
-            _getWistiaEmbedUrl: function (document) {
-                return "https://www.wistia.com/embed/" + document.properties['pm:providers'].find(element => element.provider === "wistia").externalId;
+            _getProjects: function () {
+                // Check if we have an access token before making the API call
+                if (!this.accessToken) {
+                    console.warn('No access token available for fetching Wistia projects');
+                    this.projects = [];
+                    return;
+                }
+
+                fetch("https://api.wistia.com/v1/projects.json?sort_by=created&sort_direction=0", {
+                    headers: {
+                        'Authorization': 'Bearer ' + this.accessToken
+                    }
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                }).then(data => {
+                    this.projects = data.map(project => ({
+                        label: project.name,
+                        id: project.hashedId
+                    }));
+                    // Set default project if projects exist
+                    if (this.projects.length > 0 && !this.options.project_id) {
+                        this.options.project_id = this.projects[0].id;
+                    }
+                }).catch(error => {
+                    console.error('Error fetching Wistia projects:', error);
+                    this.projects = [];
+                });
+            },
+
+            _getWistiaMediaId: function (document) {
+                return document.properties['pm:providers'].find(element => element.provider === "wistia").externalId;
             },
 
             isWistiaPublish: function (document) {
