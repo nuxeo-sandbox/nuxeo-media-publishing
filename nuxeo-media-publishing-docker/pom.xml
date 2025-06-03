@@ -8,7 +8,8 @@
   </parent>
 
   <artifactId>nuxeo-media-publishing-docker</artifactId>
-  <name>Nuxeo media publishing docker</name>
+  <name>Nuxeo Media Publishing Docker</name>
+  <description>Nuxeo Media Publishing Docker</description>
   <packaging>pom</packaging>
 
   <build>

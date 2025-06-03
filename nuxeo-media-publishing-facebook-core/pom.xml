@@ -10,6 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>nuxeo-media-publishing-facebook-core</artifactId>
+  <name>Nuxeo Media Publishing Facebook Core</name>
+  <description>Nuxeo Media Publishing Facebook Core</description>
 
     <dependencies>
         <dependency>
