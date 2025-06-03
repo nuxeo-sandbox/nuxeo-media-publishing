@@ -17,6 +17,7 @@ limitations under the License.
 
 <link rel="import" href="actions/nuxeo-youtube-publish.html">
 <link rel="import" href="actions/nuxeo-facebook-publish.html">
+<link rel="import" href="actions/nuxeo-wistia-publish.html">
 <link rel="import" href="tab/nuxeo-media-publish-tab.html">
 
 <nuxeo-slot-content name="youtubePublish" slot="DOCUMENT_ACTIONS" order="46">
@@ -29,7 +30,17 @@ limitations under the License.
     </template>
 </nuxeo-slot-content>
 
-<nuxeo-slot-content name="facebookPublish" slot="DOCUMENT_ACTIONS" order="47">
+<nuxeo-slot-content name="wistiaPublish" slot="DOCUMENT_ACTIONS" order="47">
+    <template>
+        <nuxeo-filter document="[[document]]" facet="Video">
+            <template>
+                <nuxeo-wistia-publish icon="/nuxeo/img/wistia.svg" label="label.action.wistia" document="[[document]]" provider-id="wistia"></nuxeo-wistia-publish>
+            </template>
+        </nuxeo-filter>
+    </template>
+</nuxeo-slot-content>
+
+<nuxeo-slot-content name="facebookPublish" slot="DOCUMENT_ACTIONS" order="48">
     <template>
         <nuxeo-filter document="[[document]]" facet="Video,Picture">
             <template>
