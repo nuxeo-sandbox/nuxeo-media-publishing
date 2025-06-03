@@ -1,9 +1,13 @@
 {
   "label.action.youtube": "Publish to Youtube",
+  "label.action.wistia": "Publish to Wistia",
   "label.action.facebook": "Publish to Facebook",
   "label.action.youtube.title": "Video Title",
   "label.action.youtube.description": "Description",
   "label.action.youtube.visibility": "Visibility",
+  "label.action.wistia.name": "Name",
+  "label.action.wistia.description": "Description",
+  "label.action.wistia.project": "Folder",
   "label.action.publish": "Publish",
   "label.action.publish.sucess": "Successfully Published",
   "label.action.unpublish": "Unpublish",

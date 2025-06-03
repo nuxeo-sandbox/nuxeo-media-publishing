@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Media {
+    protected int id;
 
     protected String name;
 
@@ -58,6 +59,14 @@ public class Media {
 
     @JsonProperty("assets")
     protected List<Assets> assets = new ArrayList<>();
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

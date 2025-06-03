@@ -19,12 +19,16 @@
 package org.nuxeo.ecm.media.publishing.wistia;
 
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpRequestInitializer;
+
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.JsonObjectParser;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.platform.oauth2.providers.AbstractOAuth2UserEmailProvider;
 
 import java.io.IOException;
@@ -34,6 +38,8 @@ import java.io.IOException;
  */
 public class WistiaOAuth2ServiceProvider extends AbstractOAuth2UserEmailProvider {
 
+    private static final Log log = LogFactory.getLog(WistiaOAuth2ServiceProvider.class);
+
     private static final String ACCOUNT_INFO_URL = "https://api.wistia.com/v1/account.json";
 
     private static final HttpRequestFactory requestFactory =
@@ -41,11 +47,23 @@ public class WistiaOAuth2ServiceProvider extends AbstractOAuth2UserEmailProvider
 
     @Override
     protected String getUserEmail(String accessToken) throws IOException {
+        log.debug("Fetching user email from Wistia account info");
         GenericUrl url = new GenericUrl(ACCOUNT_INFO_URL);
-        url.set("api_password", accessToken);
+        
+        HttpRequest request = requestFactory.buildGetRequest(url);
 
-        HttpResponse response = requestFactory.buildGetRequest(url).execute();
+        HttpHeaders headers = request.getHeaders();
+        headers.setAuthorization("Bearer " + accessToken);
+
+        log.debug("Making request to Wistia account API: " + ACCOUNT_INFO_URL);
+        HttpResponse response = request.setHeaders(headers).execute();
+        
+        log.debug("Received response from Wistia account API with status: " + response.getStatusCode());
         GenericJson json = response.parseAs(GenericJson.class);
-        return (String) json.get("name");
+        
+        String userEmail = (String) json.get("name");
+        log.info("Successfully retrieved user email from Wistia account: " + userEmail);
+        
+        return userEmail;
     }
 }
